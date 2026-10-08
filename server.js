@@ -12,6 +12,7 @@ const ADMIN_ID    = String(process.env.ADMIN_ID || '');
 const WEBHOOK_URL = (process.env.WEBHOOK_URL || '').replace(/\/$/, '');
 const GAME_NAME   = process.env.GAME_NAME || 'Standknife';
 const SITE_URL    = WEBHOOK_URL || '';
+const TG_NOTIFY   = String(process.env.TG_NOTIFY || 'false').toLowerCase() === 'true';
 
 const rnd  = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
 const pick = a => a[Math.floor(Math.random()*a.length)];
@@ -162,7 +163,6 @@ if (BOT_TOKEN) {
       keyboard: [
         [{ text: '📝 Добавить промокод' }],
         [{ text: '📢 Сменить канал' }, { text: '📋 Мои промокоды' }],
-        [{ text: '🔔 Уведомления' }],
       ],
       resize_keyboard: true,
       is_persistent: true
@@ -179,8 +179,7 @@ if (BOT_TOKEN) {
 
   function statusLine(u) {
     const ch = u.channel ? `<b>${u.channel}</b>` : '<i>не задан</i>';
-    const sub = u.subscribed ? '🔔 включены' : '🔕 выключены';
-    return `📢 Канал: ${ch}\n${sub}`;
+    return `📢 Канал: ${ch}`;
   }
 
   async function showMenu(chatId, fromId, extra = '') {
@@ -191,7 +190,6 @@ if (BOT_TOKEN) {
     return send(chatId, text, MAIN_KB);
   }
 
-  // ---------- СОЗДАНИЕ ПРОМОКОДА (общая функция) ----------
   function addPromo(fromId, code, channel) {
     const promo = {
       id: uid(),
@@ -204,18 +202,17 @@ if (BOT_TOKEN) {
     db.promos.push(promo);
     save();
 
-    // мгновенное SSE-обновление для сайта
+    // мгновенное обновление сайта через SSE
     broadcast('promo-added', {
       id: promo.id, game: promo.game, channel: promo.channel, addedAt: promo.addedAt
     });
 
-    // рассылка уведомлений всем подписчикам (кроме автора)
-    notifyUsers(promo, fromId);
+    // опционально: рассылка в ТГ (по умолчанию выключена)
+    if (TG_NOTIFY) notifyUsers(promo, fromId);
 
     return promo;
   }
 
-  // ---------- РАССЫЛКА ПОДПИСЧИКАМ ----------
   async function notifyUsers(promo, excludeId) {
     const ids = new Set();
     if (ADMIN_ID) ids.add(ADMIN_ID);
@@ -225,8 +222,7 @@ if (BOT_TOKEN) {
     const text =
       `🔔 <b>Новый промокод!</b>\n\n` +
       `🎮 Игра: <b>${promo.game}</b>\n` +
-      `📢 Канал: <b>${promo.channel}</b>\n` +
-      `🕒 Только что` +
+      `📢 Канал: <b>${promo.channel}</b>` +
       siteLine;
 
     for (const id of ids) {
@@ -234,11 +230,10 @@ if (BOT_TOKEN) {
       const u = db.users[id];
       if (u && u.subscribed === false) continue;
       await send(id, text, MAIN_KB);
-      await new Promise(r => setTimeout(r, 80)); // анти-флуд
+      await new Promise(r => setTimeout(r, 80));
     }
   }
 
-  // ---------- ОБРАБОТКА СООБЩЕНИЙ ----------
   bot.on('message', (msg) => {
     const chatId = msg.chat.id;
     const fromId = String(msg.from?.id || '');
@@ -271,22 +266,11 @@ if (BOT_TOKEN) {
 
     const u = getUser(fromId);
 
-    // --- отмена ---
     if (text === '❌ Отмена') {
       u.awaiting = null; save();
       return showMenu(chatId, fromId, '❌ Отменено');
     }
 
-    // --- уведомления ---
-    if (text === '🔔 Уведомления' || text === '/notify') {
-      u.subscribed = !u.subscribed;
-      save();
-      return showMenu(chatId, fromId, u.subscribed
-        ? '🔔 Уведомления <b>включены</b>'
-        : '🔕 Уведомления <b>выключены</b>');
-    }
-
-    // --- мои промокоды ---
     if (text === '📋 Мои промокоды' || text === '/list') {
       const mine = db.promos.filter(p => p.addedBy === fromId);
       if (!mine.length) return send(chatId, '📭 У тебя пока нет промокодов', MAIN_KB);
@@ -295,7 +279,6 @@ if (BOT_TOKEN) {
       ).join('\n\n'), MAIN_KB);
     }
 
-    // --- сменить канал ---
     if (text === '📢 Сменить канал' || text === '/channel') {
       u.awaiting = 'channel'; save();
       return send(chatId,
@@ -305,7 +288,6 @@ if (BOT_TOKEN) {
       );
     }
 
-    // --- добавить промокод ---
     if (text === '📝 Добавить промокод' || text === '/addpromo') {
       if (!u.channel) {
         u.awaiting = 'channel'; save();
@@ -322,7 +304,6 @@ if (BOT_TOKEN) {
       );
     }
 
-    // --- админ-команды ---
     if (fromId === ADMIN_ID && text.startsWith('/add ')) {
       const id = text.slice(5).trim();
       if (!/^\d+$/.test(id)) return send(chatId, '❌ Формат: <code>/add 123456789</code>');
@@ -355,10 +336,8 @@ if (BOT_TOKEN) {
 
     if (!text) return;
 
-    // --- ожидание имени канала ---
     if (u.awaiting === 'channel' || !u.channel) {
       if (text.length > 100) return send(chatId, '❌ Слишком длинное имя (макс 100)', CANCEL_KB);
-
       const looksLikePromo = /^[A-Z0-9_\-]{5,}$/.test(text) && !text.startsWith('@');
       if (looksLikePromo && !u.channel) {
         return send(chatId,
@@ -367,7 +346,6 @@ if (BOT_TOKEN) {
           CANCEL_KB
         );
       }
-
       u.channel = text;
       u.awaiting = null;
       save();
@@ -378,7 +356,6 @@ if (BOT_TOKEN) {
       );
     }
 
-    // --- ожидание промокода ---
     if (u.awaiting === 'promo') {
       if (text.length > 200) return send(chatId, '❌ Слишком длинный код (макс 200)', CANCEL_KB);
       const promo = addPromo(fromId, text, u.channel);
@@ -387,13 +364,11 @@ if (BOT_TOKEN) {
         `✅ <b>Промокод добавлен!</b>\n\n` +
         `🔑 <code>${text}</code>\n` +
         `📢 ${u.channel}\n` +
-        `🆔 <code>${promo.id}</code>\n\n` +
-        `Уже на сайте, подписчики получили уведомление.`,
+        `🆔 <code>${promo.id}</code>`,
         MAIN_KB
       );
     }
 
-    // --- свободный текст, похожий на промокод ---
     if (u.channel && /^[A-Z0-9_\-]{4,}$/.test(text)) {
       if (text.length > 200) return send(chatId, '❌ Слишком длинный код', MAIN_KB);
       const promo = addPromo(fromId, text, u.channel);
