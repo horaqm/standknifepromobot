@@ -28,7 +28,26 @@ try { if (fs.existsSync(DB_FILE)) db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8
 db.allowed = db.allowed || [];
 db.users   = db.users   || {};
 db.promos  = db.promos  || [];
-function save() { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2)); }
+
+// Асинхронное сохранение — не блокирует event loop
+let saveTimer = null;
+let savePending = false;
+function save() {
+  if (saveTimer) return;
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    fs.writeFile(DB_FILE, JSON.stringify(db, null, 2), (err) => {
+      if (err) console.error('save error:', err.message);
+    });
+  }, 150);
+}
+// гарантированная запись при выключении
+process.on('SIGTERM', flushSave);
+process.on('SIGINT', flushSave);
+function flushSave() {
+  try { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2)); } catch {}
+  process.exit(0);
+}
 
 function isAllowed(id) {
   const s = String(id);
@@ -45,6 +64,8 @@ function getUser(id) {
 
 // ---------- SSE ----------
 const sseClients = new Set();
+const SSE_MAX = 150; // лимит одновременных SSE-соединений
+
 function broadcast(type, payload) {
   const msg = `data: ${JSON.stringify({ type, payload })}\n\n`;
   for (const res of sseClients) {
@@ -52,11 +73,18 @@ function broadcast(type, payload) {
   }
 }
 
-// ---------- КАПЧА ----------
+// ---------- КАПЧА (с авто-очисткой) ----------
 const captchas = new Map();
+const CAPTCHA_MAX = 5000;
 setInterval(() => {
   const now = Date.now();
   for (const [k, v] of captchas) if (v.expires < now) captchas.delete(k);
+  // если слишком много — удаляем самые старые
+  if (captchas.size > CAPTCHA_MAX) {
+    const arr = [...captchas.entries()].sort((a,b) => a[1].expires - b[1].expires);
+    const toDelete = arr.slice(0, captchas.size - CAPTCHA_MAX);
+    for (const [k] of toDelete) captchas.delete(k);
+  }
 }, 60_000).unref();
 
 function makeCaptcha() {
@@ -80,17 +108,31 @@ app.use((_req, res, next) => {
   next();
 });
 
+// Умный rate-limit с учётом X-Forwarded-For (реальный IP клиента)
 const ipHits = new Map();
 function rateLimit(max) {
   return (req, res, next) => {
-    const ip = req.ip || '?';
+    const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || '?';
     const now = Date.now();
     const arr = (ipHits.get(ip) || []).filter(t => now - t < 60000);
-    if (arr.length >= max) return res.status(429).json({ error: 'rate_limited' });
-    arr.push(now); ipHits.set(ip, arr);
+    if (arr.length >= max) {
+      res.setHeader('Retry-After', '30');
+      return res.status(429).json({ error: 'rate_limited' });
+    }
+    arr.push(now);
+    ipHits.set(ip, arr);
     next();
   };
 }
+// очистка ipHits раз в 5 минут
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, arr] of ipHits) {
+    const fresh = arr.filter(t => now - t < 60000);
+    if (fresh.length) ipHits.set(ip, fresh);
+    else ipHits.delete(ip);
+  }
+}, 5 * 60_000).unref();
 
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h' }));
 
@@ -105,6 +147,11 @@ app.get('/api/promos', (_req, res) => {
 });
 
 app.get('/api/events', (req, res) => {
+  // если слишком много соединений — отказываем (клиент перейдёт на fallback-опрос)
+  if (sseClients.size >= SSE_MAX) {
+    return res.status(503).end();
+  }
+
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-store, no-transform');
   res.setHeader('Connection', 'keep-alive');
@@ -112,7 +159,7 @@ app.get('/api/events', (req, res) => {
   res.setHeader('Content-Encoding', 'identity');
   res.flushHeaders();
 
-  res.write(`retry: 3000\n\n`);
+  res.write(`retry: 5000\n\n`);
   res.write(`data: ${JSON.stringify({ type: 'hello' })}\n\n`);
   if (typeof res.flush === 'function') try { res.flush(); } catch {}
 
@@ -122,13 +169,15 @@ app.get('/api/events', (req, res) => {
       res.write(`: ping ${Date.now()}\n\n`);
       if (typeof res.flush === 'function') res.flush();
     } catch {}
-  }, 15000);
+  }, 20000);
   req.on('close', () => { clearInterval(ping); sseClients.delete(res); });
 });
 
-app.post('/api/captcha', rateLimit(300), (_req, res) => res.json(makeCaptcha()));
+// Капча — 60 запросов в минуту на IP (хватит с запасом)
+app.post('/api/captcha', rateLimit(60), (_req, res) => res.json(makeCaptcha()));
 
-app.post('/api/reveal', rateLimit(300), (req, res) => {
+// Проверка капчи — 120 в минуту
+app.post('/api/reveal', rateLimit(120), (req, res) => {
   const { captchaId, answer, promoId } = req.body || {};
   if (typeof captchaId !== 'string' || typeof answer !== 'string' || typeof promoId !== 'string')
     return res.status(400).json({ error: 'bad_request' });
@@ -146,6 +195,9 @@ app.post('/api/reveal', rateLimit(300), (req, res) => {
 
   res.json({ code: promo.code, game: promo.game, channel: promo.channel });
 });
+
+// Health-check (для UptimeRobot)
+app.get('/api/health', (_req, res) => res.json({ ok: true, uptime: process.uptime() }));
 
 // ---------- BOT ----------
 if (BOT_TOKEN) {
@@ -202,12 +254,10 @@ if (BOT_TOKEN) {
     db.promos.push(promo);
     save();
 
-    // мгновенное обновление сайта через SSE
     broadcast('promo-added', {
       id: promo.id, game: promo.game, channel: promo.channel, addedAt: promo.addedAt
     });
 
-    // опционально: рассылка в ТГ (по умолчанию выключена)
     if (TG_NOTIFY) notifyUsers(promo, fromId);
 
     return promo;
@@ -274,7 +324,7 @@ if (BOT_TOKEN) {
     if (text === '📋 Мои промокоды' || text === '/list') {
       const mine = db.promos.filter(p => p.addedBy === fromId);
       if (!mine.length) return send(chatId, '📭 У тебя пока нет промокодов', MAIN_KB);
-      return send(chatId, '📋 <b>Твои промокоды:</b>\n\n' + mine.map(p =>
+      return send(chatId, '📋 <b>Твои промокоды:</b>\n\n' + mine.slice(-20).map(p =>
         `🔑 <code>${p.code}</code>\n   id: <code>${p.id}</code>\n   ${new Date(p.addedAt).toLocaleString('ru')}`
       ).join('\n\n'), MAIN_KB);
     }
@@ -332,6 +382,17 @@ if (BOT_TOKEN) {
       db.promos.splice(i, 1); save();
       broadcast('promo-removed', { id });
       return send(chatId, '🗑 Удалён');
+    }
+    if (fromId === ADMIN_ID && text === '/stats') {
+      return send(chatId,
+        `📊 <b>Статистика</b>\n\n` +
+        `🌐 SSE-соединений: ${sseClients.size}/${SSE_MAX}\n` +
+        `🔐 Капч в памяти: ${captchas.size}\n` +
+        `🎮 Промокодов: ${db.promos.length}\n` +
+        `👥 Пользователей: ${Object.keys(db.users).length}\n` +
+        `⏱ Uptime: ${Math.floor(process.uptime()/60)} мин\n` +
+        `💾 RAM: ${Math.round(process.memoryUsage().rss/1024/1024)} МБ`
+      );
     }
 
     if (!text) return;
