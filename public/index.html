@@ -136,7 +136,7 @@
     .card:hover{transform:translateY(-4px);background:var(--card-hover);border-color:var(--border-strong)}
   }
   .card.fresh{
-    animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both, glow 2s ease-out;
+    animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both, glow 2.4s ease-out;
   }
   @keyframes glow{
     0%{box-shadow:0 0 0 0 rgba(10,132,255,.5), var(--shadow-card)}
@@ -345,8 +345,8 @@ const toast = $('toast');
 
 let lastFocused = null;
 let currentPromo = null;
-let lastPromosHash = '';
-const freshIds = new Set(); // id только что добавленных
+let lastIds = [];
+const freshUntil = new Map(); // id -> timestamp (мс) до которого подсвечиваем "new"
 
 async function api(path, opts){
   const ctrl = new AbortController();
@@ -354,6 +354,7 @@ async function api(path, opts){
   try {
     const res = await fetch(path, {
       headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
       signal: ctrl.signal,
       ...opts
     });
@@ -411,10 +412,20 @@ async function loadPromos({ silent } = {}){
 }
 
 function renderGrid(promos, game, silent){
-  const hash = JSON.stringify(promos.map(p => p.id + p.addedAt));
-  if (hash === lastPromosHash && silent) return;
-  const isNewData = lastPromosHash && hash !== lastPromosHash;
-  lastPromosHash = hash;
+  const ids = promos.map(p => p.id);
+  const isFirstLoad = lastIds.length === 0;
+  const added = ids.filter(id => !lastIds.includes(id));
+  const removed = lastIds.filter(id => !ids.includes(id));
+
+  // если ничего не изменилось — не перерисовываем (защита от мигания)
+  if (silent && added.length === 0 && removed.length === 0 && grid.children.length === promos.length) {
+    return;
+  }
+
+  // помечаем новые как fresh на 8 секунд
+  const now = Date.now();
+  for (const id of added) freshUntil.set(id, now + 8000);
+  lastIds = ids;
 
   if (!promos.length){
     grid.innerHTML = `<div class="empty">Пока нет ни одного промокода.<br>Заходи позже 👀</div>`;
@@ -425,7 +436,7 @@ function renderGrid(promos, game, silent){
   countText.textContent = `Доступно ${promos.length} ${plural(promos.length, 'промокод', 'промокода', 'промокодов')}`;
 
   grid.innerHTML = promos.map((p, i) => {
-    const fresh = freshIds.has(p.id);
+    const fresh = (freshUntil.get(p.id) || 0) > now;
     return `
       <article class="card ${fresh ? 'fresh' : ''}" style="animation-delay:${Math.min(i*50, 400)}ms" data-id="${esc(p.id)}">
         <div class="card-top">
@@ -459,7 +470,7 @@ function renderGrid(promos, game, silent){
     });
   });
 
-  if (isNewData) showToast('🔔 Новый промокод на сайте!');
+  if (!isFirstLoad && added.length > 0) showToast('🔔 Новый промокод на сайте!');
 }
 
 function plural(n, one, two, many){
@@ -631,7 +642,7 @@ async function copyText(text){
   } catch { return false; }
 }
 
-// ---------- SSE: живые обновления ----------
+// ---------- SSE ----------
 function connectSSE(){
   let es;
   try { es = new EventSource('/api/events'); }
@@ -641,25 +652,21 @@ function connectSSE(){
     let msg;
     try { msg = JSON.parse(e.data); } catch { return; }
 
-    if (msg.type === 'promo-added'){
-      if (msg.payload && msg.payload.id) freshIds.add(msg.payload.id);
-      loadPromos({ silent: true });
-      setTimeout(() => { if (msg.payload) freshIds.delete(msg.payload.id); }, 5000);
-    }
-    if (msg.type === 'promo-removed'){
+    if (msg.type === 'promo-added' || msg.type === 'promo-removed' || msg.type === 'user-updated'){
       loadPromos({ silent: true });
     }
-  };
-
-  es.onerror = () => {
-    // EventSource сам переподключится, ничего не делаем
   };
 }
 
 // ---------- СТАРТ ----------
 loadPromos();
 connectSSE();
-setInterval(() => loadPromos({ silent: true }), 20_000); // fallback
+// fallback: обновляемся каждые 5 секунд даже если SSE не работает
+setInterval(() => loadPromos({ silent: true }), 5_000);
+// при возврате на вкладку — мгновенно
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) loadPromos({ silent: true });
+});
 </script>
 </body>
 </html>
