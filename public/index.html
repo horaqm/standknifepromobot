@@ -24,6 +24,7 @@
     --field:rgba(255,255,255,.05);
     --green:#30d158;
     --red:#ff453a;
+    --yellow:#ff9f0a;
     --overlay:rgba(0,0,0,.55);
     --shadow:0 30px 80px rgba(0,0,0,.5);
     --shadow-card:0 2px 8px rgba(0,0,0,.3), 0 20px 50px rgba(0,0,0,.4);
@@ -104,6 +105,51 @@
   }
   .counter .dot.off{background:var(--text3);animation:none}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.6)}70%{box-shadow:0 0 0 8px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
+
+  /* баннер уведомлений */
+  .notify-banner{
+    display:none;
+    align-items:center;gap:14px;
+    margin:24px auto 0;max-width:520px;
+    padding:14px 20px;
+    border-radius:100px;
+    background:linear-gradient(135deg,rgba(10,132,255,.14),rgba(94,92,230,.14));
+    border:1px solid var(--accent-soft-border);
+    backdrop-filter:blur(14px) saturate(160%);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+    animation:enter .6s .2s cubic-bezier(.22,.61,.36,1) both;
+  }
+  .notify-banner.show{display:inline-flex}
+  .notify-banner .bell{
+    width:34px;height:34px;border-radius:50%;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#0a84ff,#5e5ce6);
+    color:#fff;font-size:17px;flex-shrink:0;
+    box-shadow:0 6px 16px rgba(10,132,255,.35);
+  }
+  .notify-banner .txt{flex:1;text-align:left;font-size:14px;line-height:1.35}
+  .notify-banner .txt b{font-weight:600}
+  .notify-banner .txt span{color:var(--text2);font-size:13px}
+  .notify-banner button{
+    padding:9px 16px;border:0;border-radius:100px;cursor:pointer;
+    font:inherit;font-size:13px;font-weight:600;color:#fff;
+    background:linear-gradient(135deg,#0a84ff,#5e5ce6);
+    box-shadow:0 4px 12px rgba(10,132,255,.3);
+    transition:transform .15s ease,filter .2s ease;
+    white-space:nowrap;
+  }
+  .notify-banner button:hover{filter:brightness(1.08)}
+  .notify-banner button:active{transform:scale(.96)}
+  .notify-banner.ok{
+    background:linear-gradient(135deg,rgba(48,209,88,.14),rgba(40,167,69,.14));
+    border-color:rgba(48,209,88,.3);
+  }
+  .notify-banner.ok .bell{background:linear-gradient(135deg,#30d158,#28a745);box-shadow:0 6px 16px rgba(48,209,88,.3)}
+  .notify-banner.blocked{
+    background:linear-gradient(135deg,rgba(255,159,10,.14),rgba(255,69,58,.14));
+    border-color:rgba(255,159,10,.3);
+  }
+  .notify-banner.blocked .bell{background:linear-gradient(135deg,#ff9f0a,#ff453a);box-shadow:0 6px 16px rgba(255,159,10,.3)}
 
   .section{padding:32px 0 80px}
   .grid{
@@ -301,6 +347,8 @@
   @media (max-width:400px){
     .modal{padding:34px 22px 26px;border-radius:24px}
     .card{padding:20px 18px 18px}
+    .notify-banner{padding:12px 14px;gap:10px;border-radius:20px}
+    .notify-banner .txt{font-size:13px}
   }
 </style>
 </head>
@@ -316,6 +364,16 @@
     <div class="counter">
       <span class="dot" id="statusDot"></span>
       <span id="countText">Загрузка…</span>
+    </div>
+
+    <!-- Баннер уведомлений -->
+    <div class="notify-banner" id="notifyBanner">
+      <div class="bell" id="notifyBell">🔔</div>
+      <div class="txt" id="notifyText">
+        <b>Включи уведомления</b>
+        <span>Узнавай о новых промокодах первым</span>
+      </div>
+      <button id="notifyBtn">Включить</button>
     </div>
   </header>
 
@@ -342,12 +400,84 @@ const $ = id => document.getElementById(id);
 const overlay = $('overlay'), modalBody = $('modalBody'), closeBtn = $('closeBtn');
 const grid = $('grid'), countText = $('countText'), statusDot = $('statusDot');
 const toast = $('toast');
+const notifyBanner = $('notifyBanner'), notifyBtn = $('notifyBtn');
+const notifyText = $('notifyText'), notifyBell = $('notifyBell');
 
 let lastFocused = null;
 let currentPromo = null;
 let lastIds = [];
-const freshUntil = new Map(); // id -> timestamp (мс) до которого подсвечиваем "new"
+const freshUntil = new Map();
 
+// ---------- WEB NOTIFICATIONS ----------
+function updateNotifyBanner(){
+  const supported = 'Notification' in window;
+  if (!supported){
+    notifyBanner.classList.remove('show');
+    return;
+  }
+  const perm = Notification.permission;
+
+  if (perm === 'granted'){
+    notifyBanner.classList.add('show', 'ok');
+    notifyBanner.classList.remove('blocked');
+    notifyBell.textContent = '🔔';
+    notifyText.innerHTML = '<b>Уведомления включены</b><span>Мы сообщим о новых промокодах</span>';
+    notifyBtn.textContent = 'Ок';
+    notifyBtn.onclick = () => notifyBanner.classList.remove('show');
+    return;
+  }
+  if (perm === 'denied'){
+    notifyBanner.classList.add('show', 'blocked');
+    notifyBanner.classList.remove('ok');
+    notifyBell.textContent = '🔕';
+    notifyText.innerHTML = '<b>Уведомления заблокированы</b><span>Разреши их в настройках браузера</span>';
+    notifyBtn.textContent = 'Скрыть';
+    notifyBtn.onclick = () => notifyBanner.classList.remove('show');
+    return;
+  }
+  // default
+  notifyBanner.classList.add('show');
+  notifyBanner.classList.remove('ok', 'blocked');
+  notifyBell.textContent = '🔔';
+  notifyText.innerHTML = '<b>Включи уведомления</b><span>Узнавай о новых промокодах первым</span>';
+  notifyBtn.textContent = 'Включить';
+  notifyBtn.onclick = async () => {
+    try {
+      const perm = await Notification.requestPermission();
+      updateNotifyBanner();
+      if (perm === 'granted'){
+        showBrowserNotification({
+          title: 'Уведомления включены 🎉',
+          body: 'Теперь ты узнаешь о новых промокодах первым!'
+        });
+      }
+    } catch {}
+  };
+}
+
+function showBrowserNotification({ title, body, tag }){
+  if (!('Notification' in window)) return;
+  if (Notification.permission !== 'granted') return;
+  try {
+    const n = new Notification(title, {
+      body,
+      tag: tag || 'standknife-promo',
+      icon: '/icon.png',
+      badge: '/icon.png',
+      silent: false
+    });
+    n.onclick = () => {
+      window.focus();
+      n.close();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    setTimeout(() => { try { n.close(); } catch {} }, 12000);
+  } catch (e){
+    // fallback — некоторые браузеры требуют service worker
+  }
+}
+
+// ---------- API ----------
 async function api(path, opts){
   const ctrl = new AbortController();
   const timeout = setTimeout(() => ctrl.abort(), 60000);
@@ -417,12 +547,10 @@ function renderGrid(promos, game, silent){
   const added = ids.filter(id => !lastIds.includes(id));
   const removed = lastIds.filter(id => !ids.includes(id));
 
-  // если ничего не изменилось — не перерисовываем (защита от мигания)
   if (silent && added.length === 0 && removed.length === 0 && grid.children.length === promos.length) {
     return;
   }
 
-  // помечаем новые как fresh на 8 секунд
   const now = Date.now();
   for (const id of added) freshUntil.set(id, now + 8000);
   lastIds = ids;
@@ -470,7 +598,27 @@ function renderGrid(promos, game, silent){
     });
   });
 
-  if (!isFirstLoad && added.length > 0) showToast('🔔 Новый промокод на сайте!');
+  // новые промокоды (не при первой загрузке)
+  if (!isFirstLoad && added.length > 0){
+    showToast('🔔 Новый промокод на сайте!');
+
+    // браузерное уведомление
+    const newPromos = promos.filter(p => added.includes(p.id));
+    if (newPromos.length === 1){
+      const p = newPromos[0];
+      showBrowserNotification({
+        title: '🔔 Новый промокод!',
+        body: `${p.game} — от ${p.channel}. Открой сайт, чтобы получить код.`,
+        tag: 'promo-' + p.id
+      });
+    } else if (newPromos.length > 1){
+      showBrowserNotification({
+        title: `🔔 ${newPromos.length} новых промокода!`,
+        body: newPromos.slice(0, 3).map(p => `${p.game} — ${p.channel}`).join('\n'),
+        tag: 'promo-multi-' + Date.now()
+      });
+    }
+  }
 }
 
 function plural(n, one, two, many){
@@ -659,11 +807,10 @@ function connectSSE(){
 }
 
 // ---------- СТАРТ ----------
+updateNotifyBanner();
 loadPromos();
 connectSSE();
-// fallback: обновляемся каждые 5 секунд даже если SSE не работает
 setInterval(() => loadPromos({ silent: true }), 5_000);
-// при возврате на вкладку — мгновенно
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) loadPromos({ silent: true });
 });
