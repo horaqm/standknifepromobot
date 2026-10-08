@@ -16,7 +16,7 @@ const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const uid = () => crypto.randomBytes(6).toString('hex');
 
-// ---------- БАЗА (один JSON-файл) ----------
+// ---------- БАЗА ----------
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_FILE  = path.join(DATA_DIR, 'db.json');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -75,7 +75,6 @@ function rateLimit(max) {
 
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h' }));
 
-// список промокодов БЕЗ кодов
 app.get('/api/promos', (_req, res) => {
   const promos = db.promos
     .slice()
@@ -121,7 +120,6 @@ if (BOT_TOKEN) {
     const fromId = String(msg.from?.id || '');
     const text   = (msg.text || '').trim();
 
-    // /start и /help
     if (text === '/start' || text === '/help') {
       if (!isAllowed(fromId)) {
         return send(chatId,
@@ -149,7 +147,6 @@ if (BOT_TOKEN) {
 
     if (!isAllowed(fromId)) return send(chatId, '⛔ Нет доступа.');
 
-    // команды админа
     if (text.startsWith('/add ') && fromId === ADMIN_ID) {
       const id = text.slice(5).trim();
       if (!/^\d+$/.test(id)) return send(chatId, '❌ Формат: /add 123456789');
@@ -172,7 +169,6 @@ if (BOT_TOKEN) {
       }).join('\n'));
     }
 
-    // смена канала
     if (text.startsWith('/channel ')) {
       const ch = text.slice(9).trim();
       if (!ch) return send(chatId, '❌ Пустое имя');
@@ -182,7 +178,6 @@ if (BOT_TOKEN) {
       return send(chatId, `✅ Канал изменён: ${ch}`);
     }
 
-    // свои промокоды
     if (text === '/list') {
       const mine = db.promos.filter(p => p.addedBy === fromId);
       if (!mine.length) return send(chatId, 'У тебя пока нет промокодов');
@@ -204,7 +199,6 @@ if (BOT_TOKEN) {
 
     if (!text) return;
 
-    // первое сообщение = имя канала
     const user = db.users[fromId] || {};
     if (!user.channel) {
       if (text.length > 100) return send(chatId, '❌ Слишком длинное имя канала');
@@ -215,7 +209,6 @@ if (BOT_TOKEN) {
       return send(chatId, `✅ Канал сохранён: ${text}\n\nТеперь отправляй промокоды — они появятся на сайте.`);
     }
 
-    // промокод
     if (text.length > 200) return send(chatId, '❌ Слишком длинный код (макс. 200)');
     const promo = {
       id: uid(),
