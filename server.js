@@ -12,9 +12,9 @@ const ADMIN_ID    = String(process.env.ADMIN_ID || '');
 const WEBHOOK_URL = (process.env.WEBHOOK_URL || '').replace(/\/$/, '');
 const GAME_NAME   = process.env.GAME_NAME || 'Standknife';
 
-const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+const rnd  = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
 const pick = a => a[Math.floor(Math.random()*a.length)];
-const uid = () => crypto.randomBytes(6).toString('hex');
+const uid  = () => crypto.randomBytes(6).toString('hex');
 
 // ---------- БАЗА ----------
 const DATA_DIR = path.join(__dirname, 'data');
@@ -31,6 +31,19 @@ function save() { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2)); }
 function isAllowed(id) {
   const s = String(id);
   return s === ADMIN_ID || db.allowed.includes(s);
+}
+function getUser(id) {
+  if (!db.users[id]) db.users[id] = { channel: null, awaiting: null };
+  return db.users[id];
+}
+
+// ---------- SSE (живые обновления) ----------
+const sseClients = new Set();
+function broadcast(type, payload) {
+  const msg = `data: ${JSON.stringify({ type, payload })}\n\n`;
+  for (const res of sseClients) {
+    try { res.write(msg); } catch { sseClients.delete(res); }
+  }
 }
 
 // ---------- КАПЧА ----------
@@ -75,6 +88,7 @@ function rateLimit(max) {
 
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h' }));
 
+// список промокодов
 app.get('/api/promos', (_req, res) => {
   const promos = db.promos
     .slice()
@@ -83,9 +97,25 @@ app.get('/api/promos', (_req, res) => {
   res.json({ game: GAME_NAME, promos });
 });
 
-app.post('/api/captcha', rateLimit(200), (_req, res) => res.json(makeCaptcha()));
+// SSE — живые обновления
+app.get('/api/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
 
-app.post('/api/reveal', rateLimit(200), (req, res) => {
+  // начальное приветствие
+  res.write(`data: ${JSON.stringify({ type: 'hello' })}\n\n`);
+
+  sseClients.add(res);
+  const ping = setInterval(() => { try { res.write(': ping\n\n'); } catch {} }, 25000);
+  req.on('close', () => { clearInterval(ping); sseClients.delete(res); });
+});
+
+app.post('/api/captcha', rateLimit(300), (_req, res) => res.json(makeCaptcha()));
+
+app.post('/api/reveal', rateLimit(300), (req, res) => {
   const { captchaId, answer, promoId } = req.body || {};
   if (typeof captchaId !== 'string' || typeof answer !== 'string' || typeof promoId !== 'string')
     return res.status(400).json({ error: 'bad_request' });
@@ -113,114 +143,225 @@ if (BOT_TOKEN) {
     app.post('/api/telegram/webhook', (req, res) => { bot.processUpdate(req.body); res.sendStatus(200); });
   }
 
-  const send = (chatId, text, opts) => bot.sendMessage(chatId, text, opts).catch(() => {});
+  const send = (chatId, text, opts) => bot.sendMessage(chatId, text, { parse_mode: 'HTML', ...opts }).catch(() => {});
+
+  // главное меню
+  const MAIN_KB = {
+    reply_markup: {
+      keyboard: [
+        [{ text: '📝 Добавить промокод' }],
+        [{ text: '📢 Сменить канал' }, { text: '📋 Мои промокоды' }],
+      ],
+      resize_keyboard: true,
+      is_persistent: true
+    }
+  };
+
+  // клавиатура "отмена" (когда ждём ввод)
+  const CANCEL_KB = {
+    reply_markup: {
+      keyboard: [[{ text: '❌ Отмена' }]],
+      resize_keyboard: true,
+      is_persistent: true
+    }
+  };
+
+  function statusLine(u) {
+    if (!u.channel) return '📢 Канал: <i>не задан</i>';
+    return `📢 Канал: <b>${u.channel}</b>`;
+  }
+
+  async function showMenu(chatId, fromId, extra = '') {
+    const u = getUser(fromId);
+    const text =
+      `🏠 <b>Главное меню</b>\n\n${statusLine(u)}\n\n` +
+      `Что будешь делать?` + (extra ? `\n\n${extra}` : '');
+    return send(chatId, text, MAIN_KB);
+  }
 
   bot.on('message', (msg) => {
     const chatId = msg.chat.id;
     const fromId = String(msg.from?.id || '');
     const text   = (msg.text || '').trim();
 
+    // /start
     if (text === '/start' || text === '/help') {
       if (!isAllowed(fromId)) {
         return send(chatId,
-          `⛔ Нет доступа.\n\nТвой ID: ${fromId}\nПередай его админу, чтобы он добавил тебя: /add ${fromId}`
+          `⛔ <b>Нет доступа.</b>\n\nТвой ID: <code>${fromId}</code>\n` +
+          `Передай его админу, чтобы он добавил тебя командой:\n<code>/add ${fromId}</code>`
         );
       }
-      const user = db.users[fromId];
-      if (!user || !user.channel) {
+      const u = getUser(fromId);
+      u.awaiting = null;
+      save();
+
+      if (!u.channel) {
+        u.awaiting = 'channel';
+        save();
         return send(chatId,
-          `👋 Привет!\n\nОтправь username своего Telegram-канала (например, @mychannel).\n` +
-          `Под этим именем на сайте будут публиковаться твои промокоды.`
+          `👋 Привет!\n\nСначала задай <b>имя канала</b> — под ним на сайте будут публиковаться твои промокоды.\n\n` +
+          `Например: <code>@mychannel</code> или <code>Мой канал</code>`,
+          CANCEL_KB
         );
       }
-      return send(chatId,
-        `👋 Привет, ${user.channel}!\n\n` +
-        `Отправь промокод для игры ${GAME_NAME} — он появится на сайте.\n\n` +
-        `Команды:\n` +
-        `/list — твои промокоды\n` +
-        `/del <id> — удалить промокод\n` +
-        `/clear — удалить все свои\n` +
-        `/channel @new — сменить канал\n` +
-        `/help — справка`
-      );
+      return showMenu(chatId, fromId);
     }
 
     if (!isAllowed(fromId)) return send(chatId, '⛔ Нет доступа.');
 
-    if (text.startsWith('/add ') && fromId === ADMIN_ID) {
+    const u = getUser(fromId);
+
+    // --- общие кнопки ---
+    if (text === '❌ Отмена') {
+      u.awaiting = null; save();
+      return showMenu(chatId, fromId, '❌ Отменено');
+    }
+
+    if (text === '📋 Мои промокоды' || text === '/list') {
+      const mine = db.promos.filter(p => p.addedBy === fromId);
+      if (!mine.length) return send(chatId, '📭 У тебя пока нет промокодов', MAIN_KB);
+      return send(chatId, '📋 <b>Твои промокоды:</b>\n\n' + mine.map(p =>
+        `🔑 <code>${p.code}</code>\n   id: <code>${p.id}</code>\n   ${new Date(p.addedAt).toLocaleString('ru')}`
+      ).join('\n\n'), MAIN_KB);
+    }
+
+    if (text === '📢 Сменить канал' || text === '/channel') {
+      u.awaiting = 'channel'; save();
+      return send(chatId,
+        `📢 <b>Смена канала</b>\n\nСейчас: ${u.channel ? `<b>${u.channel}</b>` : '<i>не задан</i>'}\n\n` +
+        `Отправь новое имя канала (например, <code>@new_channel</code>)`,
+        CANCEL_KB
+      );
+    }
+
+    if (text === '📝 Добавить промокод' || text === '/addpromo') {
+      if (!u.channel) {
+        u.awaiting = 'channel'; save();
+        return send(chatId,
+          `⚠️ Сначала нужно задать канал.\n\nОтправь имя канала:`,
+          CANCEL_KB
+        );
+      }
+      u.awaiting = 'promo'; save();
+      return send(chatId,
+        `📝 <b>Добавление промокода</b>\n\nКанал: <b>${u.channel}</b>\n\n` +
+        `Отправь промокод для игры <b>${GAME_NAME}</b>:`,
+        CANCEL_KB
+      );
+    }
+
+    // --- админ-команды ---
+    if (fromId === ADMIN_ID && text.startsWith('/add ')) {
       const id = text.slice(5).trim();
-      if (!/^\d+$/.test(id)) return send(chatId, '❌ Формат: /add 123456789');
+      if (!/^\d+$/.test(id)) return send(chatId, '❌ Формат: <code>/add 123456789</code>');
       if (db.allowed.includes(id)) return send(chatId, '✅ Уже добавлен');
       db.allowed.push(id); save();
-      return send(chatId, `✅ Добавлен: ${id}`);
+      return send(chatId, `✅ Добавлен: <code>${id}</code>`);
     }
-    if (text.startsWith('/remove ') && fromId === ADMIN_ID) {
+    if (fromId === ADMIN_ID && text.startsWith('/remove ')) {
       const id = text.slice(8).trim();
       const i = db.allowed.indexOf(id);
       if (i === -1) return send(chatId, '❌ Не найден');
       db.allowed.splice(i, 1); save();
-      return send(chatId, `🗑 Удалён: ${id}`);
+      return send(chatId, `🗑 Удалён: <code>${id}</code>`);
     }
-    if (text === '/users' && fromId === ADMIN_ID) {
-      if (!db.allowed.length) return send(chatId, 'Список пуст');
-      return send(chatId, '👥 Разрешённые:\n' + db.allowed.map(id => {
-        const u = db.users[id];
-        return `${id} — ${u ? u.channel : '(не зареган)'}`;
+    if (fromId === ADMIN_ID && text === '/users') {
+      if (!db.allowed.length) return send(chatId, '📭 Список пуст');
+      return send(chatId, '👥 <b>Разрешённые:</b>\n\n' + db.allowed.map(id => {
+        const usr = db.users[id];
+        return `<code>${id}</code> — ${usr && usr.channel ? usr.channel : '<i>не зареган</i>'}`;
       }).join('\n'));
     }
-
-    if (text.startsWith('/channel ')) {
-      const ch = text.slice(9).trim();
-      if (!ch) return send(chatId, '❌ Пустое имя');
-      if (!db.users[fromId]) db.users[fromId] = {};
-      db.users[fromId].channel = ch;
-      save();
-      return send(chatId, `✅ Канал изменён: ${ch}`);
-    }
-
-    if (text === '/list') {
-      const mine = db.promos.filter(p => p.addedBy === fromId);
-      if (!mine.length) return send(chatId, 'У тебя пока нет промокодов');
-      return send(chatId, '📋 Твои промокоды:\n\n' + mine.map(p =>
-        `🔑 ${p.code}\n   id: ${p.id}\n   ${new Date(p.addedAt).toLocaleString('ru')}`
-      ).join('\n\n'));
-    }
-    if (text.startsWith('/del ')) {
+    if (fromId === ADMIN_ID && text.startsWith('/del ')) {
       const id = text.slice(5).trim();
-      const i = db.promos.findIndex(p => p.id === id && p.addedBy === fromId);
+      const i = db.promos.findIndex(p => p.id === id);
       if (i === -1) return send(chatId, '❌ Не найден');
       db.promos.splice(i, 1); save();
+      broadcast('promo-removed', { id });
       return send(chatId, '🗑 Удалён');
-    }
-    if (text === '/clear') {
-      db.promos = db.promos.filter(p => p.addedBy !== fromId); save();
-      return send(chatId, '🗑 Все твои промокоды удалены');
     }
 
     if (!text) return;
 
-    const user = db.users[fromId] || {};
-    if (!user.channel) {
-      if (text.length > 100) return send(chatId, '❌ Слишком длинное имя канала');
-      user.channel = text;
-      user.registeredAt = new Date().toISOString();
-      db.users[fromId] = user;
+    // --- состояние: ожидание имени канала ---
+    if (u.awaiting === 'channel' || !u.channel) {
+      if (text.length > 100) return send(chatId, '❌ Слишком длинное имя (макс 100)', CANCEL_KB);
+
+      // эвристика: если очень похоже на промокод (заглавные+цифры+подчёркивания и без @),
+      // переспросим, чтобы не записать промокод как имя канала
+      const looksLikePromo = /^[A-Z0-9_\-]{5,}$/.test(text) && !text.startsWith('@');
+      if (looksLikePromo && !u.channel) {
+        return send(chatId,
+          `🤔 Похоже, это <b>промокод</b>, а не имя канала.\n\n` +
+          `Сначала задай имя канала (например, <code>@mychannel</code>) — потом сможешь добавлять промокоды.\n\n` +
+          `Если это всё-таки имя канала — отправь ещё раз.`,
+          CANCEL_KB
+        );
+      }
+
+      u.channel = text;
+      u.awaiting = null;
       save();
-      return send(chatId, `✅ Канал сохранён: ${text}\n\nТеперь отправляй промокоды — они появятся на сайте.`);
+      broadcast('user-updated', { userId: fromId, channel: u.channel });
+      return send(chatId,
+        `✅ Канал сохранён: <b>${text}</b>\n\nТеперь можешь добавлять промокоды.`,
+        MAIN_KB
+      );
     }
 
-    if (text.length > 200) return send(chatId, '❌ Слишком длинный код (макс. 200)');
-    const promo = {
-      id: uid(),
-      code: text,
-      game: GAME_NAME,
-      channel: user.channel,
-      addedBy: fromId,
-      addedAt: new Date().toISOString()
-    };
-    db.promos.push(promo);
-    save();
-    send(chatId, `✅ Промокод добавлен:\n${text}\nid: ${promo.id}\n\nОн уже на сайте.`);
+    // --- состояние: ожидание промокода ---
+    if (u.awaiting === 'promo') {
+      if (text.length > 200) return send(chatId, '❌ Слишком длинный код (макс 200)', CANCEL_KB);
+      const promo = {
+        id: uid(),
+        code: text,
+        game: GAME_NAME,
+        channel: u.channel,
+        addedBy: fromId,
+        addedAt: new Date().toISOString()
+      };
+      db.promos.push(promo);
+      save();
+      u.awaiting = null; save();
+
+      // мгновенно оповещаем браузеры
+      broadcast('promo-added', {
+        id: promo.id, game: promo.game, channel: promo.channel, addedAt: promo.addedAt
+      });
+
+      return send(chatId,
+        `✅ <b>Промокод добавлен!</b>\n\n` +
+        `🔑 <code>${text}</code>\n` +
+        `📢 ${u.channel}\n` +
+        `🆔 <code>${promo.id}</code>\n\n` +
+        `Уже на сайте.`,
+        MAIN_KB
+      );
+    }
+
+    // --- свободный текст (не в режиме) ---
+    // если это похоже на промокод и канал есть — добавляем сразу
+    if (u.channel && /^[A-Z0-9_\-]{4,}$/.test(text)) {
+      const promo = {
+        id: uid(),
+        code: text,
+        game: GAME_NAME,
+        channel: u.channel,
+        addedBy: fromId,
+        addedAt: new Date().toISOString()
+      };
+      db.promos.push(promo); save();
+      broadcast('promo-added', {
+        id: promo.id, game: promo.game, channel: promo.channel, addedAt: promo.addedAt
+      });
+      return send(chatId,
+        `✅ <b>Промокод добавлен!</b>\n\n🔑 <code>${text}</code>\n🆔 <code>${promo.id}</code>`,
+        MAIN_KB
+      );
+    }
+
+    return showMenu(chatId, fromId, 'Выбери действие на клавиатуре 👇');
   });
 
   bot.on('polling_error', e => console.error('polling_error:', e.message));
