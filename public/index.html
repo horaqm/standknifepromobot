@@ -48,7 +48,6 @@
       --shadow-card:0 2px 8px rgba(0,0,0,.05), 0 20px 50px rgba(0,0,0,.10);
     }
   }
-
   *,*::before,*::after{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
   body{
@@ -58,7 +57,6 @@
     overflow-x:hidden;
     -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
-
   .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
   .bg::before,.bg::after{
     content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;will-change:transform;
@@ -98,11 +96,13 @@
     display:inline-flex;align-items:center;gap:8px;margin-top:22px;
     padding:7px 14px;border-radius:100px;font-size:13px;font-weight:500;
     color:var(--text2);background:var(--field);border:1px solid var(--border);
+    transition:opacity .3s;
   }
   .counter .dot{
     width:6px;height:6px;border-radius:50%;background:var(--green);
     box-shadow:0 0 0 0 rgba(48,209,88,.6);animation:pulse 2.4s ease-out infinite;
   }
+  .counter .dot.off{background:var(--text3);animation:none}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.6)}70%{box-shadow:0 0 0 8px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
 
   .section{padding:32px 0 80px}
@@ -135,6 +135,13 @@
   @media (hover:hover){
     .card:hover{transform:translateY(-4px);background:var(--card-hover);border-color:var(--border-strong)}
   }
+  .card.fresh{
+    animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both, glow 2s ease-out;
+  }
+  @keyframes glow{
+    0%{box-shadow:0 0 0 0 rgba(10,132,255,.5), var(--shadow-card)}
+    100%{box-shadow:0 0 0 20px rgba(10,132,255,0), var(--shadow-card)}
+  }
 
   .card-top{display:flex;align-items:center;justify-content:space-between}
   .game-icon{
@@ -147,6 +154,9 @@
     font-size:11px;font-weight:600;letter-spacing:.03em;
     padding:4px 10px;border-radius:100px;
     color:var(--text2);background:var(--field);border:1px solid var(--border);
+  }
+  .badge.new{
+    color:#fff;background:linear-gradient(135deg,#0a84ff,#5e5ce6);border-color:transparent;
   }
 
   .game-name{font-size:17px;font-weight:600;letter-spacing:-.01em;margin:0}
@@ -271,6 +281,17 @@
     font-size:13px;color:var(--text3);
   }
 
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--card-solid);color:var(--text);
+    padding:12px 20px;border-radius:100px;font-size:14px;font-weight:500;
+    border:1px solid var(--border-strong);box-shadow:var(--shadow);
+    z-index:200;opacity:0;
+    transition:transform .4s cubic-bezier(.22,.61,.36,1), opacity .3s;
+    pointer-events:none;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{
       animation-duration:.01ms !important;animation-iteration-count:1 !important;
@@ -293,7 +314,7 @@
     <h1>Промокоды</h1>
     <p class="sub">Свежие коды от наших каналов. Обновляются в реальном времени.</p>
     <div class="counter">
-      <span class="dot"></span>
+      <span class="dot" id="statusDot"></span>
       <span id="countText">Загрузка…</span>
     </div>
   </header>
@@ -312,19 +333,24 @@
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 'use strict';
 
 const $ = id => document.getElementById(id);
 const overlay = $('overlay'), modalBody = $('modalBody'), closeBtn = $('closeBtn');
-const grid = $('grid'), countText = $('countText');
+const grid = $('grid'), countText = $('countText'), statusDot = $('statusDot');
+const toast = $('toast');
 
 let lastFocused = null;
 let currentPromo = null;
+let lastPromosHash = '';
+const freshIds = new Set(); // id только что добавленных
 
 async function api(path, opts){
   const ctrl = new AbortController();
-  const timeout = setTimeout(() => ctrl.abort(), 15000);
+  const timeout = setTimeout(() => ctrl.abort(), 60000);
   try {
     const res = await fetch(path, {
       headers: { 'Content-Type': 'application/json' },
@@ -339,6 +365,13 @@ async function api(path, opts){
     clearTimeout(timeout);
     return { ok: false, status: 0, data: null };
   }
+}
+
+function showToast(text){
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
 function timeAgo(iso){
@@ -362,18 +395,27 @@ function esc(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-async function loadPromos(){
+async function loadPromos({ silent } = {}){
   try {
     const { ok, data } = await api('/api/promos');
     if (!ok || !data) throw new Error();
-    renderGrid(data.promos || [], data.game || 'Standknife');
+    statusDot.classList.remove('off');
+    renderGrid(data.promos || [], data.game || 'Standknife', silent);
   } catch {
-    grid.innerHTML = `<div class="empty">Не удалось загрузить промокоды.<br>Потяни вниз, чтобы обновить.</div>`;
-    countText.textContent = 'Ошибка соединения';
+    if (!silent){
+      grid.innerHTML = `<div class="empty">Не удалось загрузить промокоды.<br>Потяни вниз, чтобы обновить.</div>`;
+      countText.textContent = 'Ошибка соединения';
+      statusDot.classList.add('off');
+    }
   }
 }
 
-function renderGrid(promos, game){
+function renderGrid(promos, game, silent){
+  const hash = JSON.stringify(promos.map(p => p.id + p.addedAt));
+  if (hash === lastPromosHash && silent) return;
+  const isNewData = lastPromosHash && hash !== lastPromosHash;
+  lastPromosHash = hash;
+
   if (!promos.length){
     grid.innerHTML = `<div class="empty">Пока нет ни одного промокода.<br>Заходи позже 👀</div>`;
     countText.textContent = 'Ожидаем первый промокод';
@@ -382,30 +424,33 @@ function renderGrid(promos, game){
 
   countText.textContent = `Доступно ${promos.length} ${plural(promos.length, 'промокод', 'промокода', 'промокодов')}`;
 
-  grid.innerHTML = promos.map((p, i) => `
-    <article class="card" style="animation-delay:${Math.min(i*50, 400)}ms">
-      <div class="card-top">
-        <div class="game-icon">${gameEmoji(p.game)}</div>
-        <span class="badge">${esc(p.game)}</span>
-      </div>
-      <h3 class="game-name">Промокод на ${esc(p.game)}</h3>
-      <div class="meta">
-        <span class="meta-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-          </svg>
-          <span class="channel">${esc(p.channel)}</span>
-        </span>
-        <span class="meta-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-          </svg>
-          <span data-added="${esc(p.addedAt)}">${timeAgo(p.addedAt)}</span>
-        </span>
-      </div>
-      <button class="reveal" data-id="${esc(p.id)}">Получить промокод</button>
-    </article>
-  `).join('');
+  grid.innerHTML = promos.map((p, i) => {
+    const fresh = freshIds.has(p.id);
+    return `
+      <article class="card ${fresh ? 'fresh' : ''}" style="animation-delay:${Math.min(i*50, 400)}ms" data-id="${esc(p.id)}">
+        <div class="card-top">
+          <div class="game-icon">${gameEmoji(p.game)}</div>
+          <span class="badge ${fresh ? 'new' : ''}">${fresh ? '🆕 Новый' : esc(p.game)}</span>
+        </div>
+        <h3 class="game-name">Промокод на ${esc(p.game)}</h3>
+        <div class="meta">
+          <span class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            <span class="channel">${esc(p.channel)}</span>
+          </span>
+          <span class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span data-added="${esc(p.addedAt)}">${timeAgo(p.addedAt)}</span>
+          </span>
+        </div>
+        <button class="reveal" data-id="${esc(p.id)}">Получить промокод</button>
+      </article>
+    `;
+  }).join('');
 
   grid.querySelectorAll('.reveal').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -413,6 +458,8 @@ function renderGrid(promos, game){
       if (promo) openForPromo(promo);
     });
   });
+
+  if (isNewData) showToast('🔔 Новый промокод на сайте!');
 }
 
 function plural(n, one, two, many){
@@ -426,7 +473,7 @@ setInterval(() => {
   document.querySelectorAll('[data-added]').forEach(el => {
     el.textContent = timeAgo(el.dataset.added);
   });
-}, 60_000);
+}, 30_000);
 
 function openOverlay(){
   lastFocused = document.activeElement;
@@ -584,8 +631,35 @@ async function copyText(text){
   } catch { return false; }
 }
 
+// ---------- SSE: живые обновления ----------
+function connectSSE(){
+  let es;
+  try { es = new EventSource('/api/events'); }
+  catch { return; }
+
+  es.onmessage = (e) => {
+    let msg;
+    try { msg = JSON.parse(e.data); } catch { return; }
+
+    if (msg.type === 'promo-added'){
+      if (msg.payload && msg.payload.id) freshIds.add(msg.payload.id);
+      loadPromos({ silent: true });
+      setTimeout(() => { if (msg.payload) freshIds.delete(msg.payload.id); }, 5000);
+    }
+    if (msg.type === 'promo-removed'){
+      loadPromos({ silent: true });
+    }
+  };
+
+  es.onerror = () => {
+    // EventSource сам переподключится, ничего не делаем
+  };
+}
+
+// ---------- СТАРТ ----------
 loadPromos();
-setInterval(loadPromos, 30_000);
+connectSSE();
+setInterval(() => loadPromos({ silent: true }), 20_000); // fallback
 </script>
 </body>
 </html>
