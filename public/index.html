@@ -5,130 +5,308 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#08080a">
 <meta name="robots" content="noindex, nofollow">
-<title>Standknife — промокод</title>
+<title>Промокоды</title>
 <style>
   :root{
     color-scheme: dark light;
-    --bg:#08080a; --card:rgba(22,22,26,.72); --card-solid:#16161a;
-    --text:#f5f5f7; --text2:#a1a1a6;
-    --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.14);
-    --accent:#0a84ff; --accent-soft:rgba(10,132,255,.14); --accent-soft-border:rgba(10,132,255,.28);
-    --field:rgba(255,255,255,.05); --green:#30d158; --red:#ff453a;
-    --overlay:rgba(0,0,0,.6); --shadow:0 30px 80px rgba(0,0,0,.5);
+    --bg:#08080a;
+    --card:rgba(28,28,32,.62);
+    --card-hover:rgba(36,36,42,.72);
+    --card-solid:#16161a;
+    --text:#f5f5f7;
+    --text2:#a1a1a6;
+    --text3:#6e6e73;
+    --border:rgba(255,255,255,.08);
+    --border-strong:rgba(255,255,255,.14);
+    --accent:#0a84ff;
+    --accent-soft:rgba(10,132,255,.14);
+    --accent-soft-border:rgba(10,132,255,.28);
+    --field:rgba(255,255,255,.05);
+    --green:#30d158;
+    --red:#ff453a;
+    --overlay:rgba(0,0,0,.55);
+    --shadow:0 30px 80px rgba(0,0,0,.5);
+    --shadow-card:0 2px 8px rgba(0,0,0,.3), 0 20px 50px rgba(0,0,0,.4);
   }
   @media (prefers-color-scheme: light){
     :root{
-      --bg:#fbfbfd; --card:rgba(255,255,255,.78); --card-solid:#ffffff;
-      --text:#1d1d1f; --text2:#6e6e73;
-      --border:rgba(0,0,0,.08); --border-strong:rgba(0,0,0,.14);
-      --accent:#0071e3; --accent-soft:rgba(0,113,227,.10); --accent-soft-border:rgba(0,113,227,.24);
-      --field:rgba(0,0,0,.04); --overlay:rgba(0,0,0,.35);
+      --bg:#fbfbfd;
+      --card:rgba(255,255,255,.72);
+      --card-hover:rgba(255,255,255,.86);
+      --card-solid:#ffffff;
+      --text:#1d1d1f;
+      --text2:#6e6e73;
+      --text3:#a1a1a6;
+      --border:rgba(0,0,0,.08);
+      --border-strong:rgba(0,0,0,.14);
+      --accent:#0071e3;
+      --accent-soft:rgba(0,113,227,.10);
+      --accent-soft-border:rgba(0,113,227,.24);
+      --field:rgba(0,0,0,.04);
+      --overlay:rgba(0,0,0,.35);
       --shadow:0 30px 80px rgba(0,0,0,.18);
+      --shadow-card:0 2px 8px rgba(0,0,0,.05), 0 20px 50px rgba(0,0,0,.10);
     }
   }
+
   *,*::before,*::after{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
   body{
-    margin:0; min-height:100svh; display:grid; place-items:center; padding:24px;
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
-    background:var(--bg); color:var(--text); line-height:1.5; overflow-x:hidden;
-    -webkit-font-smoothing:antialiased;
+    margin:0; min-height:100svh;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
-  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-  .bg::before,.bg::after{content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;will-change:transform}
-  .bg::before{width:60vmax;height:60vmax;top:-25vmax;left:-20vmax;background:radial-gradient(circle,#0a84ff 0%,transparent 65%);animation:drift1 24s ease-in-out infinite}
-  .bg::after{width:50vmax;height:50vmax;bottom:-22vmax;right:-15vmax;background:radial-gradient(circle,#5e5ce6 0%,transparent 65%);animation:drift2 28s ease-in-out infinite}
-  @media (prefers-color-scheme: light){ .bg::before,.bg::after{opacity:.32} }
-  @keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(4vmax,3vmax,0) scale(1.1)}}
-  @keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-4vmax,-3vmax,0) scale(1.15)}}
 
-  .shell{position:relative;z-index:1;width:100%;max-width:460px}
-  .card{
-    position:relative; padding:48px 36px 40px; border-radius:28px; text-align:center;
-    background:var(--card); border:1px solid var(--border);
-    backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%);
-    box-shadow:0 1px 3px rgba(0,0,0,.05),0 24px 60px rgba(0,0,0,.18);
-    animation:enter .8s cubic-bezier(.22,.61,.36,1) both;
+  /* фоновые блики — статичные пятна */
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .bg::before,.bg::after{
+    content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;will-change:transform;
   }
-  @keyframes enter{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}
-  .icon{width:76px;height:76px;margin:0 auto 26px;border-radius:24px;display:grid;place-items:center;
-    background:linear-gradient(135deg,#0a84ff 0%,#5e5ce6 60%,#bf5af2 100%);
-    box-shadow:0 12px 30px rgba(10,132,255,.35),inset 0 1px 0 rgba(255,255,255,.25)}
-  .icon svg{width:36px;height:36px;color:#fff}
-  .eyebrow{display:inline-block;margin-bottom:16px;padding:5px 12px;border-radius:100px;
+  .bg::before{
+    width:60vmax;height:60vmax;top:-25vmax;left:-20vmax;
+    background:radial-gradient(circle,#0a84ff 0%,transparent 65%);
+    animation:drift1 30s ease-in-out infinite;
+  }
+  .bg::after{
+    width:50vmax;height:50vmax;bottom:-22vmax;right:-15vmax;
+    background:radial-gradient(circle,#5e5ce6 0%,transparent 65%);
+    animation:drift2 34s ease-in-out infinite;
+  }
+  @media (prefers-color-scheme: light){ .bg::before,.bg::after{opacity:.28} }
+  @keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(4vmax,3vmax,0) scale(1.08)}}
+  @keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-4vmax,-3vmax,0) scale(1.12)}}
+
+  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* ---------- HERO ---------- */
+  header.hero{padding:80px 0 40px;text-align:center;animation:enter .8s cubic-bezier(.22,.61,.36,1) both}
+  @keyframes enter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .eyebrow{
+    display:inline-block;margin-bottom:20px;padding:6px 14px;border-radius:100px;
     font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-soft-border)}
-  h1{margin:0 0 12px;font-size:clamp(40px,9vw,54px);font-weight:700;letter-spacing:-.035em;line-height:1.04;
-    background:linear-gradient(180deg,var(--text) 35%,var(--text2));
-    -webkit-background-clip:text;background-clip:text;color:transparent}
-  .lead{max-width:320px;margin:0 auto 32px;font-size:16px;color:var(--text2);line-height:1.5}
-  .cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:17px 30px;
-    border:0;border-radius:100px;cursor:pointer;font:inherit;font-size:16px;font-weight:600;letter-spacing:-.01em;color:#fff;
-    background:linear-gradient(135deg,#0a84ff,#5e5ce6);box-shadow:0 8px 24px rgba(10,132,255,.3);
-    -webkit-tap-highlight-color:transparent;transition:transform .15s,box-shadow .3s,filter .3s;will-change:transform}
-  .cta:hover{filter:brightness(1.08);box-shadow:0 12px 32px rgba(10,132,255,.42)}
-  .cta:active{transform:scale(.97)}
-  .cta:disabled{opacity:.55;cursor:default;filter:none;transform:none;box-shadow:none}
-  .tiny{margin-top:20px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:12.5px;color:var(--text2)}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);
-    box-shadow:0 0 0 0 rgba(48,209,88,.6);animation:pulse 2.2s ease-out infinite}
+    color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-soft-border);
+  }
+  h1{
+    margin:0 0 16px;
+    font-size:clamp(40px,8vw,72px);
+    font-weight:700;letter-spacing:-.035em;line-height:1.04;
+    background:linear-gradient(180deg,var(--text) 30%,var(--text2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{max-width:520px;margin:0 auto;font-size:clamp(16px,2vw,19px);color:var(--text2);line-height:1.5}
+  .counter{
+    display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+    padding:7px 14px;border-radius:100px;font-size:13px;font-weight:500;
+    color:var(--text2);background:var(--field);border:1px solid var(--border);
+  }
+  .counter .dot{
+    width:6px;height:6px;border-radius:50%;background:var(--green);
+    box-shadow:0 0 0 0 rgba(48,209,88,.6);animation:pulse 2.4s ease-out infinite;
+  }
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.6)}70%{box-shadow:0 0 0 8px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
 
-  .overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
-    background:var(--overlay);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
-    opacity:0;pointer-events:none;transition:opacity .3s}
+  /* ---------- СЕТКА ---------- */
+  .section{padding:32px 0 80px}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:18px;
+  }
+  .empty{
+    padding:60px 20px;text-align:center;color:var(--text2);
+    font-size:15px;border:1.5px dashed var(--border-strong);border-radius:24px;
+  }
+
+  .card{
+    position:relative;
+    padding:22px 22px 20px;
+    border-radius:22px;
+    background:var(--card);
+    border:1px solid var(--border);
+    backdrop-filter:blur(16px) saturate(160%);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);
+    box-shadow:var(--shadow-card);
+    display:flex;flex-direction:column;gap:14px;
+    transition:transform .35s cubic-bezier(.22,.61,.36,1), background .3s ease, border-color .3s ease;
+    will-change:transform;
+    animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both;
+  }
+  @keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+  @media (hover:hover){
+    .card:hover{transform:translateY(-4px);background:var(--card-hover);border-color:var(--border-strong)}
+  }
+
+  .card-top{display:flex;align-items:center;justify-content:space-between}
+  .game-icon{
+    width:42px;height:42px;border-radius:12px;
+    display:grid;place-items:center;font-size:22px;
+    background:var(--accent-soft);color:var(--accent);
+    box-shadow:inset 0 0 0 1px var(--accent-soft-border);
+  }
+  .badge{
+    font-size:11px;font-weight:600;letter-spacing:.03em;
+    padding:4px 10px;border-radius:100px;
+    color:var(--text2);background:var(--field);border:1px solid var(--border);
+  }
+
+  .game-name{font-size:17px;font-weight:600;letter-spacing:-.01em;margin:0}
+  .meta{
+    display:flex;flex-wrap:wrap;gap:8px 12px;
+    font-size:13px;color:var(--text2);
+  }
+  .meta-item{display:inline-flex;align-items:center;gap:5px}
+  .meta-item svg{width:13px;height:13px;flex-shrink:0;opacity:.7}
+  .channel{color:var(--accent);font-weight:500;text-decoration:none}
+
+  .reveal{
+    margin-top:auto;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;padding:13px 22px;
+    border:0;border-radius:100px;cursor:pointer;
+    font:inherit;font-size:14.5px;font-weight:600;letter-spacing:-.01em;color:#fff;
+    background:linear-gradient(135deg,#0a84ff,#5e5ce6);
+    box-shadow:0 6px 18px rgba(10,132,255,.28);
+    -webkit-tap-highlight-color:transparent;
+    transition:transform .15s ease, box-shadow .3s ease, filter .3s ease;
+    will-change:transform;
+  }
+  .reveal:hover{filter:brightness(1.08);box-shadow:0 10px 26px rgba(10,132,255,.4)}
+  .reveal:active{transform:scale(.97)}
+  .reveal:focus-visible{outline:3px solid rgba(10,132,255,.45);outline-offset:3px}
+
+  /* ---------- МОДАЛКА ---------- */
+  .overlay{
+    position:fixed;inset:0;z-index:100;
+    display:grid;place-items:center;padding:20px;
+    background:var(--overlay);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    opacity:0;pointer-events:none;
+    transition:opacity .3s ease;
+  }
   .overlay.show{opacity:1;pointer-events:auto}
-  .modal{position:relative;width:100%;max-width:420px;padding:38px 30px 30px;border-radius:28px;
-    background:var(--card-solid);border:1px solid var(--border-strong);text-align:center;box-shadow:var(--shadow);
-    transform:scale(.92) translateY(12px);transition:transform .42s cubic-bezier(.22,.61,.36,1);will-change:transform}
+  .modal{
+    position:relative;width:100%;max-width:420px;
+    padding:38px 30px 30px;border-radius:28px;
+    background:var(--card-solid);border:1px solid var(--border-strong);
+    text-align:center;box-shadow:var(--shadow);
+    transform:scale(.92) translateY(12px);
+    transition:transform .42s cubic-bezier(.22,.61,.36,1);
+    will-change:transform;
+  }
   .overlay.show .modal{transform:none}
-  .close{position:absolute;top:14px;right:14px;width:32px;height:32px;border:0;border-radius:50%;
-    background:var(--field);color:var(--text2);font-size:14px;cursor:pointer;display:grid;place-items:center;transition:background .2s,color .2s}
+
+  .close{
+    position:absolute;top:14px;right:14px;
+    width:32px;height:32px;border:0;border-radius:50%;
+    background:var(--field);color:var(--text2);font-size:14px;
+    cursor:pointer;display:grid;place-items:center;
+    transition:background .2s,color .2s;
+  }
   .close:hover{background:var(--border-strong);color:var(--text)}
+
   .m-title{margin:0 0 8px;font-size:22px;font-weight:600;letter-spacing:-.02em}
   .m-sub{margin:0 0 24px;font-size:14px;color:var(--text2);line-height:1.5}
+
   .q{font-size:18px;font-weight:500;letter-spacing:-.01em;margin-bottom:16px}
-  .emojis{padding:14px 10px;margin-bottom:16px;font-size:28px;line-height:1.35;word-break:break-word;border-radius:16px;background:var(--field);user-select:none}
-  .input{width:100%;padding:15px 16px;font:inherit;font-size:17px;text-align:center;color:var(--text);background:var(--field);
-    border:1.5px solid transparent;border-radius:14px;outline:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s,background .2s}
+  .emojis{
+    padding:14px 10px;margin-bottom:16px;
+    font-size:28px;line-height:1.35;word-break:break-word;
+    border-radius:16px;background:var(--field);user-select:none;
+  }
+  .input{
+    width:100%;padding:15px 16px;font:inherit;font-size:17px;text-align:center;
+    color:var(--text);background:var(--field);
+    border:1.5px solid transparent;border-radius:14px;
+    outline:none;-webkit-appearance:none;
+    transition:border-color .2s,box-shadow .2s,background .2s;
+  }
   .input::placeholder{color:var(--text2)}
   .input:focus{background:var(--card-solid);border-color:var(--accent);box-shadow:0 0 0 4px rgba(10,132,255,.15)}
+
   .err{min-height:19px;margin:9px 2px 12px;font-size:13px;color:var(--red);text-align:center}
   @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
   .shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;padding:15px 26px;border:0;border-radius:100px;cursor:pointer;
+    font:inherit;font-size:15px;font-weight:600;letter-spacing:-.01em;color:#fff;
+    background:linear-gradient(135deg,#0a84ff,#5e5ce6);
+    box-shadow:0 6px 20px rgba(10,132,255,.3);
+    -webkit-tap-highlight-color:transparent;
+    transition:transform .15s ease, box-shadow .3s ease, filter .3s ease;
+    will-change:transform;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn:active{transform:scale(.97)}
+  .btn:disabled{opacity:.55;cursor:default;filter:none;transform:none;box-shadow:none}
+  .btn.copied{background:linear-gradient(135deg,#30d158,#28a745);box-shadow:0 6px 20px rgba(48,209,88,.3)}
+
   .success{width:64px;height:64px;margin:0 auto 20px}
   .success circle,.success path{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
   .success circle{stroke-dasharray:166;stroke-dashoffset:166;animation:draw .6s cubic-bezier(.65,0,.45,1) forwards}
   .success path{stroke-dasharray:48;stroke-dashoffset:48;animation:draw .4s .38s cubic-bezier(.65,0,.45,1) forwards}
   @keyframes draw{to{stroke-dashoffset:0}}
-  .code-box{padding:20px 16px;margin-bottom:18px;border-radius:18px;background:var(--field);border:1.5px dashed var(--border-strong)}
-  .code{display:block;word-break:break-all;user-select:all;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    font-size:clamp(19px,5.4vw,23px);font-weight:600;letter-spacing:.06em;color:var(--accent)}
-  .spinner{width:34px;height:34px;margin:12px auto 4px;border-radius:50%;
-    border:3px solid var(--border-strong);border-top-color:var(--accent);animation:spin .8s linear infinite}
+
+  .code-box{
+    padding:20px 16px;margin-bottom:18px;border-radius:18px;
+    background:var(--field);border:1.5px dashed var(--border-strong);
+  }
+  .code{
+    display:block;word-break:break-all;user-select:all;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:clamp(19px,5.4vw,23px);font-weight:600;letter-spacing:.06em;
+    color:var(--accent);
+  }
+
+  .spinner{
+    width:34px;height:34px;margin:12px auto 4px;border-radius:50%;
+    border:3px solid var(--border-strong);border-top-color:var(--accent);
+    animation:spin .8s linear infinite;
+  }
   @keyframes spin{to{transform:rotate(360deg)}}
-  @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-  @media (max-width:400px){.card{padding:42px 22px 32px;border-radius:24px}.modal{padding:34px 22px 26px;border-radius:24px}}
+
+  footer{
+    padding:20px 0 50px;text-align:center;
+    font-size:13px;color:var(--text3);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      animation-duration:.01ms !important;animation-iteration-count:1 !important;
+      transition-duration:.01ms !important;
+    }
+  }
+  @media (max-width:400px){
+    .modal{padding:34px 22px 26px;border-radius:24px}
+    .card{padding:20px 18px 18px}
+  }
 </style>
 </head>
 <body>
 
 <div class="bg" aria-hidden="true"></div>
 
-<main class="shell">
-  <section class="card">
-    <div class="icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/>
-      </svg>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Актуально</span>
+    <h1>Промокоды</h1>
+    <p class="sub">Свежие коды от наших каналов. Обновляются в реальном времени.</p>
+    <div class="counter">
+      <span class="dot"></span>
+      <span id="countText">Загрузка…</span>
     </div>
-    <span class="eyebrow">Эксклюзив</span>
-    <h1 id="gameTitle">Standknife</h1>
-    <p class="lead">Заберите промокод на внутриигровые бонусы. Доступен сразу после короткой проверки.</p>
-    <button class="cta" id="cta" type="button">Получить промокод</button>
-    <p class="tiny"><span class="dot"></span><span id="statusText">Проверяем статус…</span></p>
+  </header>
+
+  <section class="section">
+    <div class="grid" id="grid"></div>
   </section>
-</main>
+
+  <footer>Данные обновляются автоматически</footer>
+</div>
 
 <div class="overlay" id="overlay" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -139,118 +317,239 @@
 
 <script>
 'use strict';
-const $ = id => document.getElementById(id);
-const overlay = $('overlay'), modalBody = $('modalBody'), cta = $('cta'),
-      closeBtn = $('closeBtn'), gameTitle = $('gameTitle'), statusText = $('statusText');
-let lastFocused = null, promoAvailable = false;
 
+const $ = id => document.getElementById(id);
+const overlay = $('overlay'), modalBody = $('modalBody'), closeBtn = $('closeBtn');
+const grid = $('grid'), countText = $('countText');
+
+let lastFocused = null;
+let currentPromo = null;
+
+// ---------- API ----------
 async function api(path, opts){
   const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
-  let data = null; try { data = await res.json(); } catch {}
+  let data = null;
+  try { data = await res.json(); } catch {}
   return { ok: res.ok, status: res.status, data };
 }
 
-async function refreshStatus(){
-  try {
-    const { ok, data } = await api('/api/status');
-    if (!ok || !data) throw new Error();
-    gameTitle.textContent = data.game || 'Standknife';
-    promoAvailable = !!data.available;
-    if (promoAvailable){
-      cta.disabled = false; cta.textContent = 'Получить промокод';
-      statusText.textContent = 'Промокод доступен';
-    } else {
-      cta.disabled = true; cta.textContent = 'Скоро появится';
-      statusText.textContent = 'Промокод пока не опубликован';
-    }
-  } catch { statusText.textContent = 'Не удалось получить статус'; }
+// ---------- ВРЕМЯ "X НАЗАД" ----------
+function timeAgo(iso){
+  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (diff < 10) return 'только что';
+  if (diff < 60) return `${diff} сек назад`;
+  if (diff < 3600) return `${Math.floor(diff/60)} мин назад`;
+  if (diff < 86400) return `${Math.floor(diff/3600)} ч назад`;
+  if (diff < 604800) return `${Math.floor(diff/86400)} дн назад`;
+  return new Date(iso).toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
 }
 
+// ---------- ЭМОДЗИ ИГРЫ (стабильный по хешу) ----------
+function gameEmoji(name){
+  const list = ['🎮','🔪','⚔️','🎯','🏆','💎','🔥','⚡','🎲','🚀','👾','🎪'];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  return list[Math.abs(h) % list.length];
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---------- РЕНДЕР СЕТКИ ----------
+async function loadPromos(){
+  try {
+    const { ok, data } = await api('/api/promos');
+    if (!ok || !data) throw new Error();
+    renderGrid(data.promos || [], data.game || 'Standknife');
+  } catch {
+    grid.innerHTML = `<div class="empty">Не удалось загрузить промокоды</div>`;
+    countText.textContent = 'Ошибка соединения';
+  }
+}
+
+function renderGrid(promos, game){
+  if (!promos.length){
+    grid.innerHTML = `<div class="empty">Пока нет ни одного промокода.<br>Заходи позже 👀</div>`;
+    countText.textContent = 'Ожидаем первый промокод';
+    return;
+  }
+
+  countText.textContent = `Доступно ${promos.length} ${plural(promos.length, 'промокод', 'промокода', 'промокодов')}`;
+
+  grid.innerHTML = promos.map((p, i) => `
+    <article class="card" style="animation-delay:${Math.min(i*50, 400)}ms">
+      <div class="card-top">
+        <div class="game-icon">${gameEmoji(p.game)}</div>
+        <span class="badge">${esc(p.game)}</span>
+      </div>
+      <h3 class="game-name">Промокод на ${esc(p.game)}</h3>
+      <div class="meta">
+        <span class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+          <span class="channel">${esc(p.channel)}</span>
+        </span>
+        <span class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span data-added="${esc(p.addedAt)}">${timeAgo(p.addedAt)}</span>
+        </span>
+      </div>
+      <button class="reveal" data-id="${esc(p.id)}">
+        Получить промокод
+      </button>
+    </article>
+  `).join('');
+
+  // обработчик кнопок
+  grid.querySelectorAll('.reveal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const promo = promos.find(x => x.id === btn.dataset.id);
+      if (promo) openForPromo(promo);
+    });
+  });
+}
+
+function plural(n, one, two, many){
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return two;
+  return many;
+}
+
+// обновление времени раз в минуту
+setInterval(() => {
+  document.querySelectorAll('[data-added]').forEach(el => {
+    el.textContent = timeAgo(el.dataset.added);
+  });
+}, 60_000);
+
+// ---------- МОДАЛКА ----------
 function openOverlay(){
   lastFocused = document.activeElement;
-  overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false');
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 }
 function closeOverlay(){
-  overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true');
+  overlay.classList.remove('show');
+  overlay.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
   if (lastFocused && lastFocused.focus) lastFocused.focus();
 }
 closeBtn.addEventListener('click', closeOverlay);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay();
+});
 
 function renderLoading(){
   modalBody.innerHTML = `<div class="spinner"></div><h2 class="m-title" id="modalTitle">Секунду…</h2><p class="m-sub">Готовим проверку</p>`;
 }
 
-function renderError(title, text){
-  modalBody.innerHTML = `<h2 class="m-title" id="modalTitle">${title}</h2><p class="m-sub">${text}</p>
-    <button class="cta" id="retryBtn" type="button">Попробовать снова</button>`;
-  $('retryBtn').addEventListener('click', startCaptchaFlow);
+function renderError(title, text, retry){
+  modalBody.innerHTML = `
+    <h2 class="m-title" id="modalTitle">${esc(title)}</h2>
+    <p class="m-sub">${esc(text)}</p>
+    ${retry ? `<button class="btn" id="retryBtn" type="button">Попробовать снова</button>` : ''}
+  `;
+  if (retry) $('retryBtn').addEventListener('click', () => openForPromo(currentPromo));
 }
 
-async function startCaptchaFlow(){
-  renderLoading(); openOverlay();
+async function openForPromo(promo){
+  currentPromo = promo;
+  renderLoading();
+  openOverlay();
+
   const { ok, data } = await api('/api/captcha', { method: 'POST' });
-  if (!ok || !data) return renderError('Ошибка', 'Не удалось получить задание');
+  if (!ok || !data) return renderError('Ошибка', 'Не удалось получить задание', true);
   renderCaptcha(data);
 }
 
 function renderCaptcha(c){
   modalBody.innerHTML = `
     <h2 class="m-title" id="modalTitle">Проверка</h2>
-    <p class="m-sub">Ответьте на вопрос, чтобы получить промокод</p>
-    <div class="q">${c.q}</div>
-    ${c.display ? `<div class="emojis">${c.display}</div>` : ''}
-    <input id="answer" class="input" type="text" inputmode="numeric" autocomplete="off"
-           autocorrect="off" spellcheck="false" placeholder="Ваш ответ" aria-label="Ответ">
+    <p class="m-sub">Ответь на вопрос, чтобы получить промокод</p>
+
+    <div class="q">${esc(c.q)}</div>
+    ${c.display ? `<div class="emojis">${esc(c.display)}</div>` : ''}
+
+    <input id="answer" class="input" type="text" inputmode="numeric"
+           autocomplete="off" autocorrect="off" spellcheck="false"
+           placeholder="Ответ" aria-label="Ответ">
+
     <div class="err" id="err" role="alert" aria-live="polite"></div>
-    <button class="cta" id="checkBtn" type="button">Проверить</button>`;
+    <button class="btn" id="checkBtn" type="button">Проверить</button>
+  `;
 
   const input = $('answer'), errEl = $('err'), checkBtn = $('checkBtn');
   setTimeout(() => input.focus(), 320);
 
-  function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+  const shake = el => { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); };
 
   async function submit(){
     const val = input.value.trim();
     if (!val){ errEl.textContent = 'Введите ответ'; shake(input); return; }
-    checkBtn.disabled = true; checkBtn.textContent = 'Проверяем…';
+    checkBtn.disabled = true;
+    checkBtn.textContent = 'Проверяем…';
+
     const { ok, status, data } = await api('/api/reveal', {
-      method: 'POST', body: JSON.stringify({ id: c.id, answer: val })
+      method: 'POST',
+      body: JSON.stringify({ captchaId: c.id, answer: val, promoId: currentPromo.id })
     });
+
     if (ok && data && data.code){ renderCode(data); return; }
-    checkBtn.disabled = false; checkBtn.textContent = 'Проверить';
-    if (status === 404){ closeOverlay(); refreshStatus(); return; }
-    if (status === 429) return renderError('Слишком много попыток', 'Попробуйте позже.');
-    if (data && data.error === 'wrong_answer'){
-      errEl.textContent = 'Неверно, попробуйте ещё раз';
-      input.value = ''; input.focus(); shake(input); return;
+
+    checkBtn.disabled = false;
+    checkBtn.textContent = 'Проверить';
+
+    if (status === 404){
+      closeOverlay();
+      loadPromos();
+      return;
     }
-    startCaptchaFlow();
+    if (status === 429){
+      return renderError('Слишком много попыток', 'Попробуй позже', false);
+    }
+    if (data && data.error === 'wrong_answer'){
+      errEl.textContent = 'Неверно, попробуй ещё раз';
+      input.value = '';
+      input.focus();
+      shake(input);
+      return;
+    }
+    openForPromo(currentPromo);
   }
+
   checkBtn.addEventListener('click', submit);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
   input.addEventListener('input', () => { if (errEl.textContent) errEl.textContent = ''; });
 }
 
-function renderCode({ code, game }){
+function renderCode({ code, game, channel }){
   modalBody.innerHTML = `
     <svg class="success" viewBox="0 0 52 52" aria-hidden="true">
-      <circle cx="26" cy="26" r="24"/><path d="M14 27l8 8 16-16"/>
+      <circle cx="26" cy="26" r="24"/>
+      <path d="M14 27l8 8 16-16"/>
     </svg>
-    <h2 class="m-title" id="modalTitle">Промокод для ${game || 'Standknife'}</h2>
-    <p class="m-sub">Скопируйте и активируйте его в игре</p>
-    <div class="code-box"><span class="code" id="codeText">${code}</span></div>
-    <button class="cta" id="copyBtn" type="button">Скопировать код</button>`;
+    <h2 class="m-title" id="modalTitle">Промокод для ${esc(game)}</h2>
+    <p class="m-sub">Скопируй и активируй в игре${channel ? `<br>От канала <b>${esc(channel)}</b>` : ''}</p>
+    <div class="code-box"><span class="code" id="codeText">${esc(code)}</span></div>
+    <button class="btn" id="copyBtn" type="button">Скопировать код</button>
+  `;
 
   const copyBtn = $('copyBtn');
   copyBtn.addEventListener('click', async () => {
     const ok = await copyText(code);
-    copyBtn.textContent = ok ? 'Скопировано ✓' : 'Выделите вручную';
-    copyBtn.style.background = ok ? 'linear-gradient(135deg,#30d158,#28a745)' : '';
-    setTimeout(() => { copyBtn.textContent = 'Скопировать код'; copyBtn.style.background = ''; }, 1900);
+    copyBtn.textContent = ok ? 'Скопировано ✓' : 'Выдели вручную';
+    if (ok) copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = 'Скопировать код';
+      copyBtn.classList.remove('copied');
+    }, 1900);
   });
 }
 
@@ -258,15 +557,19 @@ async function copyText(text){
   try { if (navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; } } catch {}
   try {
     const ta = document.createElement('textarea');
-    ta.value = text; ta.setAttribute('readonly',''); ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
-    document.body.appendChild(ta); ta.select();
-    const ok = document.execCommand('copy'); ta.remove(); return ok;
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
   } catch { return false; }
 }
 
-cta.addEventListener('click', () => { if (promoAvailable) startCaptchaFlow(); });
-refreshStatus();
-setInterval(refreshStatus, 60_000);
+// ---------- СТАРТ ----------
+loadPromos();
+setInterval(loadPromos, 30_000);
 </script>
 </body>
 </html>
