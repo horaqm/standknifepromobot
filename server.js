@@ -53,7 +53,7 @@ function makeCaptcha() {
 
 // ---------- EXPRESS ----------
 const app = express();
-app.set('trust proxy', 1);
+app.set('trust proxy', true);
 app.use(express.json({ limit: '32kb' }));
 app.use((_req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -84,9 +84,9 @@ app.get('/api/promos', (_req, res) => {
   res.json({ game: GAME_NAME, promos });
 });
 
-app.post('/api/captcha', rateLimit(15), (_req, res) => res.json(makeCaptcha()));
+app.post('/api/captcha', rateLimit(200), (_req, res) => res.json(makeCaptcha()));
 
-app.post('/api/reveal', rateLimit(30), (req, res) => {
+app.post('/api/reveal', rateLimit(200), (req, res) => {
   const { captchaId, answer, promoId } = req.body || {};
   if (typeof captchaId !== 'string' || typeof answer !== 'string' || typeof promoId !== 'string')
     return res.status(400).json({ error: 'bad_request' });
