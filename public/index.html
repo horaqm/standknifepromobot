@@ -59,7 +59,6 @@
     -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
 
-  /* фоновые блики — статичные пятна */
   .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
   .bg::before,.bg::after{
     content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;will-change:transform;
@@ -80,7 +79,6 @@
 
   .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 22px}
 
-  /* ---------- HERO ---------- */
   header.hero{padding:80px 0 40px;text-align:center;animation:enter .8s cubic-bezier(.22,.61,.36,1) both}
   @keyframes enter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
   .eyebrow{
@@ -107,7 +105,6 @@
   }
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.6)}70%{box-shadow:0 0 0 8px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
 
-  /* ---------- СЕТКА ---------- */
   .section{padding:32px 0 80px}
   .grid{
     display:grid;
@@ -117,6 +114,7 @@
   .empty{
     padding:60px 20px;text-align:center;color:var(--text2);
     font-size:15px;border:1.5px dashed var(--border-strong);border-radius:24px;
+    grid-column:1/-1;
   }
 
   .card{
@@ -158,7 +156,7 @@
   }
   .meta-item{display:inline-flex;align-items:center;gap:5px}
   .meta-item svg{width:13px;height:13px;flex-shrink:0;opacity:.7}
-  .channel{color:var(--accent);font-weight:500;text-decoration:none}
+  .channel{color:var(--accent);font-weight:500}
 
   .reveal{
     margin-top:auto;
@@ -176,7 +174,6 @@
   .reveal:active{transform:scale(.97)}
   .reveal:focus-visible{outline:3px solid rgba(10,132,255,.45);outline-offset:3px}
 
-  /* ---------- МОДАЛКА ---------- */
   .overlay{
     position:fixed;inset:0;z-index:100;
     display:grid;place-items:center;padding:20px;
@@ -325,38 +322,25 @@ const grid = $('grid'), countText = $('countText');
 let lastFocused = null;
 let currentPromo = null;
 
-// ---------- API ----------
-async function openForPromo(promo){
-  currentPromo = promo;
-  renderLoading();
-  openOverlay();
-
-  // 3 попытки с задержкой — на случай холодного старта Render
-  let lastErr = null;
-  for (let attempt = 0; attempt < 3; attempt++){
-    try {
-      const { ok, status, data } = await api('/api/captcha', { method: 'POST' });
-      if (ok && data && data.q){
-        return renderCaptcha(data);
-      }
-      // 429 — подожди и попробуй снова
-      if (status === 429){
-        lastErr = 'Слишком много запросов';
-        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
-        continue;
-      }
-      lastErr = 'Сервер не ответил';
-    } catch (e){
-      lastErr = 'Сеть недоступна';
-    }
-    // пауза перед повторной попыткой
-    if (attempt < 2) await new Promise(r => setTimeout(r, 1200 * (attempt + 1)));
+async function api(path, opts){
+  const ctrl = new AbortController();
+  const timeout = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const res = await fetch(path, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: ctrl.signal,
+      ...opts
+    });
+    clearTimeout(timeout);
+    let data = null;
+    try { data = await res.json(); } catch {}
+    return { ok: res.ok, status: res.status, data };
+  } catch (e){
+    clearTimeout(timeout);
+    return { ok: false, status: 0, data: null };
   }
-
-  renderError('Не получилось', lastErr + '. Попробуй ещё раз через пару секунд.', true);
 }
 
-// ---------- ВРЕМЯ "X НАЗАД" ----------
 function timeAgo(iso){
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (diff < 10) return 'только что';
@@ -367,7 +351,6 @@ function timeAgo(iso){
   return new Date(iso).toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
 }
 
-// ---------- ЭМОДЗИ ИГРЫ (стабильный по хешу) ----------
 function gameEmoji(name){
   const list = ['🎮','🔪','⚔️','🎯','🏆','💎','🔥','⚡','🎲','🚀','👾','🎪'];
   let h = 0;
@@ -379,14 +362,13 @@ function esc(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// ---------- РЕНДЕР СЕТКИ ----------
 async function loadPromos(){
   try {
     const { ok, data } = await api('/api/promos');
     if (!ok || !data) throw new Error();
     renderGrid(data.promos || [], data.game || 'Standknife');
   } catch {
-    grid.innerHTML = `<div class="empty">Не удалось загрузить промокоды</div>`;
+    grid.innerHTML = `<div class="empty">Не удалось загрузить промокоды.<br>Потяни вниз, чтобы обновить.</div>`;
     countText.textContent = 'Ошибка соединения';
   }
 }
@@ -421,13 +403,10 @@ function renderGrid(promos, game){
           <span data-added="${esc(p.addedAt)}">${timeAgo(p.addedAt)}</span>
         </span>
       </div>
-      <button class="reveal" data-id="${esc(p.id)}">
-        Получить промокод
-      </button>
+      <button class="reveal" data-id="${esc(p.id)}">Получить промокод</button>
     </article>
   `).join('');
 
-  // обработчик кнопок
   grid.querySelectorAll('.reveal').forEach(btn => {
     btn.addEventListener('click', () => {
       const promo = promos.find(x => x.id === btn.dataset.id);
@@ -443,14 +422,12 @@ function plural(n, one, two, many){
   return many;
 }
 
-// обновление времени раз в минуту
 setInterval(() => {
   document.querySelectorAll('[data-added]').forEach(el => {
     el.textContent = timeAgo(el.dataset.added);
   });
 }, 60_000);
 
-// ---------- МОДАЛКА ----------
 function openOverlay(){
   lastFocused = document.activeElement;
   overlay.classList.add('show');
@@ -607,7 +584,6 @@ async function copyText(text){
   } catch { return false; }
 }
 
-// ---------- СТАРТ ----------
 loadPromos();
 setInterval(loadPromos, 30_000);
 </script>
