@@ -547,6 +547,7 @@ function renderGrid(promos, game, silent){
   const added = ids.filter(id => !lastIds.includes(id));
   const removed = lastIds.filter(id => !ids.includes(id));
 
+  // если ничего не изменилось — не перерисовываем (защита от мигания)
   if (silent && added.length === 0 && removed.length === 0 && grid.children.length === promos.length) {
     return;
   }
@@ -791,6 +792,9 @@ async function copyText(text){
 }
 
 // ---------- SSE ----------
+// Работает мгновенно, если соединение установилось.
+// Если сервер перегружен (503) — EventSource сам повторит через 5 сек,
+// а fallback-опрос ниже всё равно обновит данные раз в 5 секунд.
 function connectSSE(){
   let es;
   try { es = new EventSource('/api/events'); }
@@ -804,13 +808,20 @@ function connectSSE(){
       loadPromos({ silent: true });
     }
   };
+
+  es.onerror = () => {
+    // Ничего не делаем: EventSource переподключится сам.
+    // Fallback-опрос внизу страницы продолжит обновлять данные каждые 5 сек.
+  };
 }
 
 // ---------- СТАРТ ----------
 updateNotifyBanner();
 loadPromos();
 connectSSE();
+// fallback: обновляемся каждые 5 секунд даже если SSE не работает
 setInterval(() => loadPromos({ silent: true }), 5_000);
+// при возврате на вкладку — мгновенно
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) loadPromos({ silent: true });
 });
