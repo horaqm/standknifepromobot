@@ -326,11 +326,34 @@ let lastFocused = null;
 let currentPromo = null;
 
 // ---------- API ----------
-async function api(path, opts){
-  const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
-  let data = null;
-  try { data = await res.json(); } catch {}
-  return { ok: res.ok, status: res.status, data };
+async function openForPromo(promo){
+  currentPromo = promo;
+  renderLoading();
+  openOverlay();
+
+  // 3 попытки с задержкой — на случай холодного старта Render
+  let lastErr = null;
+  for (let attempt = 0; attempt < 3; attempt++){
+    try {
+      const { ok, status, data } = await api('/api/captcha', { method: 'POST' });
+      if (ok && data && data.q){
+        return renderCaptcha(data);
+      }
+      // 429 — подожди и попробуй снова
+      if (status === 429){
+        lastErr = 'Слишком много запросов';
+        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+        continue;
+      }
+      lastErr = 'Сервер не ответил';
+    } catch (e){
+      lastErr = 'Сеть недоступна';
+    }
+    // пауза перед повторной попыткой
+    if (attempt < 2) await new Promise(r => setTimeout(r, 1200 * (attempt + 1)));
+  }
+
+  renderError('Не получилось', lastErr + '. Попробуй ещё раз через пару секунд.', true);
 }
 
 // ---------- ВРЕМЯ "X НАЗАД" ----------
@@ -464,9 +487,26 @@ async function openForPromo(promo){
   renderLoading();
   openOverlay();
 
-  const { ok, data } = await api('/api/captcha', { method: 'POST' });
-  if (!ok || !data) return renderError('Ошибка', 'Не удалось получить задание', true);
-  renderCaptcha(data);
+  let lastErr = null;
+  for (let attempt = 0; attempt < 3; attempt++){
+    try {
+      const { ok, status, data } = await api('/api/captcha', { method: 'POST' });
+      if (ok && data && data.q){
+        return renderCaptcha(data);
+      }
+      if (status === 429){
+        lastErr = 'Слишком много запросов';
+        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+        continue;
+      }
+      lastErr = 'Сервер не ответил';
+    } catch (e){
+      lastErr = 'Сеть недоступна';
+    }
+    if (attempt < 2) await new Promise(r => setTimeout(r, 1200 * (attempt + 1)));
+  }
+
+  renderError('Не получилось', lastErr + '. Попробуй ещё раз через пару секунд.', true);
 }
 
 function renderCaptcha(c){
