@@ -391,7 +391,7 @@ function updateNotifyBanner(){
 function showBrowserNotification({ title, body, tag }){
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   try {
-    const n = new Notification(title, { body, tag: tag || 'promo', icon: '/icon.png', silent: false });
+    const n = new Notification(title, { body, tag: tag || 'promo', silent: false });
     n.onclick = () => { window.focus(); n.close(); };
     setTimeout(() => { try { n.close(); } catch {} }, 12000);
   } catch {}
@@ -618,6 +618,17 @@ function renderSlider(){
     if (positions.length > 300) positions = positions.slice(-150);
   }
 
+  function calcStats(){
+    let maxJump = 0;
+    let totalDist = 0;
+    for (let i = 1; i < positions.length; i++){
+      const dx = Math.abs(positions[i].x - positions[i-1].x);
+      if (dx > maxJump) maxJump = dx;
+      totalDist += dx;
+    }
+    return { maxJump, totalDist };
+  }
+
   function onEnd(){
     if (!dragging || isDone) return;
     dragging = false;
@@ -655,7 +666,8 @@ function renderSlider(){
     hint.classList.add('hidden');
     thumb.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 
-    verifyAndReveal({ duration, eventCount, variance });
+    const { maxJump, totalDist } = calcStats();
+    verifyAndReveal({ duration, eventCount, variance, maxJump, totalDist });
   }
 
   thumb.addEventListener('mousedown', e => { e.preventDefault(); onStart(e.clientX); });
@@ -666,10 +678,10 @@ function renderSlider(){
   document.addEventListener('touchmove', e => { if (dragging) onMove(e.touches[0].clientX); }, { passive: true });
   document.addEventListener('touchend', () => onEnd());
 
-  async function verifyAndReveal({ duration, eventCount, variance }){
+  async function verifyAndReveal({ duration, eventCount, variance, maxJump, totalDist }){
     const { ok: vOk, status: vSt, data: vData } = await api('/api/verify-slider', {
       method: 'POST',
-      body: JSON.stringify({ duration, eventCount, variance })
+      body: JSON.stringify({ duration, eventCount, variance, maxJump, totalDist })
     });
 
     if (!vOk){
@@ -692,7 +704,7 @@ function renderSlider(){
   }
 }
 
-// ===== Промокод на Canvas =====
+// ===== ПРОМОКОД НА CANVAS =====
 function renderCode({ code, game, channel }){
   modalBody.innerHTML = `
     <svg class="success" viewBox="0 0 52 52" aria-hidden="true">
@@ -769,7 +781,7 @@ function connectSSE(){
   es.onerror = () => {};
 }
 
-// ---------- Старт ----------
+// ---------- СТАРТ ----------
 updateNotifyBanner();
 loadPromos();
 connectSSE();
