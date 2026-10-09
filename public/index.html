@@ -8,7 +8,7 @@
 <title>Промокоды</title>
 <style>
   :root{
-    color-scheme: dark light;
+    color-scheme:dark light;
     --bg:#08080a;
     --card:rgba(28,28,32,.62);
     --card-hover:rgba(36,36,42,.72);
@@ -24,40 +24,31 @@
     --field:rgba(255,255,255,.05);
     --green:#30d158;
     --red:#ff453a;
-    --yellow:#ff9f0a;
     --overlay:rgba(0,0,0,.55);
     --shadow:0 30px 80px rgba(0,0,0,.5);
-    --shadow-card:0 2px 8px rgba(0,0,0,.3), 0 20px 50px rgba(0,0,0,.4);
+    --shadow-card:0 2px 8px rgba(0,0,0,.3),0 20px 50px rgba(0,0,0,.4);
   }
-  @media (prefers-color-scheme: light){
+  @media (prefers-color-scheme:light){
     :root{
-      --bg:#fbfbfd;
-      --card:rgba(255,255,255,.72);
-      --card-hover:rgba(255,255,255,.86);
-      --card-solid:#ffffff;
-      --text:#1d1d1f;
-      --text2:#6e6e73;
-      --text3:#a1a1a6;
-      --border:rgba(0,0,0,.08);
-      --border-strong:rgba(0,0,0,.14);
-      --accent:#0071e3;
-      --accent-soft:rgba(0,113,227,.10);
-      --accent-soft-border:rgba(0,113,227,.24);
-      --field:rgba(0,0,0,.04);
-      --overlay:rgba(0,0,0,.35);
-      --shadow:0 30px 80px rgba(0,0,0,.18);
-      --shadow-card:0 2px 8px rgba(0,0,0,.05), 0 20px 50px rgba(0,0,0,.10);
+      --bg:#fbfbfd;--card:rgba(255,255,255,.72);--card-hover:rgba(255,255,255,.86);
+      --card-solid:#ffffff;--text:#1d1d1f;--text2:#6e6e73;--text3:#a1a1a6;
+      --border:rgba(0,0,0,.08);--border-strong:rgba(0,0,0,.14);
+      --accent:#0071e3;--accent-soft:rgba(0,113,227,.10);--accent-soft-border:rgba(0,113,227,.24);
+      --field:rgba(0,0,0,.04);--overlay:rgba(0,0,0,.35);
+      --shadow:0 30px 80px rgba(0,0,0,.18);--shadow-card:0 2px 8px rgba(0,0,0,.05),0 20px 50px rgba(0,0,0,.10);
     }
   }
   *,*::before,*::after{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
   body{
-    margin:0; min-height:100svh;
+    margin:0;min-height:100svh;
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;
-    background:var(--bg); color:var(--text); line-height:1.5;
+    background:var(--bg);color:var(--text);line-height:1.5;
     overflow-x:hidden;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   }
+
+  /* Фон с плывущими шарами */
   .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
   .bg::before,.bg::after{
     content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;will-change:transform;
@@ -72,7 +63,7 @@
     background:radial-gradient(circle,#5e5ce6 0%,transparent 65%);
     animation:drift2 34s ease-in-out infinite;
   }
-  @media (prefers-color-scheme: light){ .bg::before,.bg::after{opacity:.28} }
+  @media (prefers-color-scheme:light){.bg::before,.bg::after{opacity:.28}}
   @keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(4vmax,3vmax,0) scale(1.08)}}
   @keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-4vmax,-3vmax,0) scale(1.12)}}
 
@@ -97,7 +88,6 @@
     display:inline-flex;align-items:center;gap:8px;margin-top:22px;
     padding:7px 14px;border-radius:100px;font-size:13px;font-weight:500;
     color:var(--text2);background:var(--field);border:1px solid var(--border);
-    transition:opacity .3s;
   }
   .counter .dot{
     width:6px;height:6px;border-radius:50%;background:var(--green);
@@ -106,12 +96,10 @@
   .counter .dot.off{background:var(--text3);animation:none}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.6)}70%{box-shadow:0 0 0 8px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
 
-  /* баннер уведомлений */
+  /* Баннер уведомлений */
   .notify-banner{
-    display:none;
-    align-items:center;gap:14px;
-    margin:24px auto 0;max-width:520px;
-    padding:14px 20px;
+    display:none;align-items:center;gap:14px;
+    margin:24px auto 0;max-width:520px;padding:14px 20px;
     border-radius:100px;
     background:linear-gradient(135deg,rgba(10,132,255,.14),rgba(94,92,230,.14));
     border:1px solid var(--accent-soft-border);
@@ -121,10 +109,8 @@
   }
   .notify-banner.show{display:inline-flex}
   .notify-banner .bell{
-    width:34px;height:34px;border-radius:50%;
-    display:grid;place-items:center;
-    background:linear-gradient(135deg,#0a84ff,#5e5ce6);
-    color:#fff;font-size:17px;flex-shrink:0;
+    width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:linear-gradient(135deg,#0a84ff,#5e5ce6);color:#fff;font-size:17px;flex-shrink:0;
     box-shadow:0 6px 16px rgba(10,132,255,.35);
   }
   .notify-banner .txt{flex:1;text-align:left;font-size:14px;line-height:1.35}
@@ -135,109 +121,73 @@
     font:inherit;font-size:13px;font-weight:600;color:#fff;
     background:linear-gradient(135deg,#0a84ff,#5e5ce6);
     box-shadow:0 4px 12px rgba(10,132,255,.3);
-    transition:transform .15s ease,filter .2s ease;
-    white-space:nowrap;
+    transition:transform .15s,filter .2s;white-space:nowrap;
   }
   .notify-banner button:hover{filter:brightness(1.08)}
   .notify-banner button:active{transform:scale(.96)}
-  .notify-banner.ok{
-    background:linear-gradient(135deg,rgba(48,209,88,.14),rgba(40,167,69,.14));
-    border-color:rgba(48,209,88,.3);
-  }
+  .notify-banner.ok{background:linear-gradient(135deg,rgba(48,209,88,.14),rgba(40,167,69,.14));border-color:rgba(48,209,88,.3)}
   .notify-banner.ok .bell{background:linear-gradient(135deg,#30d158,#28a745);box-shadow:0 6px 16px rgba(48,209,88,.3)}
-  .notify-banner.blocked{
-    background:linear-gradient(135deg,rgba(255,159,10,.14),rgba(255,69,58,.14));
-    border-color:rgba(255,159,10,.3);
-  }
+  .notify-banner.blocked{background:linear-gradient(135deg,rgba(255,159,10,.14),rgba(255,69,58,.14));border-color:rgba(255,159,10,.3)}
   .notify-banner.blocked .bell{background:linear-gradient(135deg,#ff9f0a,#ff453a);box-shadow:0 6px 16px rgba(255,159,10,.3)}
 
   .section{padding:32px 0 80px}
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:18px;
-  }
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
   .empty{
     padding:60px 20px;text-align:center;color:var(--text2);
-    font-size:15px;border:1.5px dashed var(--border-strong);border-radius:24px;
-    grid-column:1/-1;
+    font-size:15px;border:1.5px dashed var(--border-strong);border-radius:24px;grid-column:1/-1;
   }
 
   .card{
-    position:relative;
-    padding:22px 22px 20px;
-    border-radius:22px;
-    background:var(--card);
-    border:1px solid var(--border);
+    position:relative;padding:22px 22px 20px;border-radius:22px;
+    background:var(--card);border:1px solid var(--border);
     backdrop-filter:blur(16px) saturate(160%);
     -webkit-backdrop-filter:blur(16px) saturate(160%);
     box-shadow:var(--shadow-card);
     display:flex;flex-direction:column;gap:14px;
-    transition:transform .35s cubic-bezier(.22,.61,.36,1), background .3s ease, border-color .3s ease;
-    will-change:transform;
-    animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both;
+    transition:transform .35s cubic-bezier(.22,.61,.36,1),background .3s,border-color .3s;
+    will-change:transform;animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both;
   }
   @keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
-  @media (hover:hover){
-    .card:hover{transform:translateY(-4px);background:var(--card-hover);border-color:var(--border-strong)}
-  }
-  .card.fresh{
-    animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both, glow 2.4s ease-out;
-  }
-  @keyframes glow{
-    0%{box-shadow:0 0 0 0 rgba(10,132,255,.5), var(--shadow-card)}
-    100%{box-shadow:0 0 0 20px rgba(10,132,255,0), var(--shadow-card)}
-  }
+  @media (hover:hover){.card:hover{transform:translateY(-4px);background:var(--card-hover);border-color:var(--border-strong)}}
+  .card.fresh{animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both,glow 2.4s ease-out}
+  @keyframes glow{0%{box-shadow:0 0 0 0 rgba(10,132,255,.5),var(--shadow-card)}100%{box-shadow:0 0 0 20px rgba(10,132,255,0),var(--shadow-card)}}
 
   .card-top{display:flex;align-items:center;justify-content:space-between}
   .game-icon{
-    width:42px;height:42px;border-radius:12px;
-    display:grid;place-items:center;font-size:22px;
-    background:var(--accent-soft);color:var(--accent);
-    box-shadow:inset 0 0 0 1px var(--accent-soft-border);
+    width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:22px;
+    background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent-soft-border);
   }
   .badge{
     font-size:11px;font-weight:600;letter-spacing:.03em;
     padding:4px 10px;border-radius:100px;
     color:var(--text2);background:var(--field);border:1px solid var(--border);
   }
-  .badge.new{
-    color:#fff;background:linear-gradient(135deg,#0a84ff,#5e5ce6);border-color:transparent;
-  }
-
+  .badge.new{color:#fff;background:linear-gradient(135deg,#0a84ff,#5e5ce6);border-color:transparent}
   .game-name{font-size:17px;font-weight:600;letter-spacing:-.01em;margin:0}
-  .meta{
-    display:flex;flex-wrap:wrap;gap:8px 12px;
-    font-size:13px;color:var(--text2);
-  }
+  .meta{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:13px;color:var(--text2)}
   .meta-item{display:inline-flex;align-items:center;gap:5px}
   .meta-item svg{width:13px;height:13px;flex-shrink:0;opacity:.7}
   .channel{color:var(--accent);font-weight:500}
 
   .reveal{
-    margin-top:auto;
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    width:100%;padding:13px 22px;
-    border:0;border-radius:100px;cursor:pointer;
+    margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;padding:13px 22px;border:0;border-radius:100px;cursor:pointer;
     font:inherit;font-size:14.5px;font-weight:600;letter-spacing:-.01em;color:#fff;
     background:linear-gradient(135deg,#0a84ff,#5e5ce6);
     box-shadow:0 6px 18px rgba(10,132,255,.28);
     -webkit-tap-highlight-color:transparent;
-    transition:transform .15s ease, box-shadow .3s ease, filter .3s ease;
-    will-change:transform;
+    transition:transform .15s,box-shadow .3s,filter .3s;will-change:transform;
   }
   .reveal:hover{filter:brightness(1.08);box-shadow:0 10px 26px rgba(10,132,255,.4)}
   .reveal:active{transform:scale(.97)}
-  .reveal:focus-visible{outline:3px solid rgba(10,132,255,.45);outline-offset:3px}
 
+  /* Оверлей */
   .overlay{
-    position:fixed;inset:0;z-index:100;
-    display:grid;place-items:center;padding:20px;
+    position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
     background:var(--overlay);
     backdrop-filter:blur(24px) saturate(180%);
     -webkit-backdrop-filter:blur(24px) saturate(180%);
-    opacity:0;pointer-events:none;
-    transition:opacity .3s ease;
+    opacity:0;pointer-events:none;transition:opacity .3s;
   }
   .overlay.show{opacity:1;pointer-events:auto}
   .modal{
@@ -246,40 +196,83 @@
     background:var(--card-solid);border:1px solid var(--border-strong);
     text-align:center;box-shadow:var(--shadow);
     transform:scale(.92) translateY(12px);
-    transition:transform .42s cubic-bezier(.22,.61,.36,1);
-    will-change:transform;
+    transition:transform .42s cubic-bezier(.22,.61,.36,1);will-change:transform;
   }
   .overlay.show .modal{transform:none}
-
   .close{
-    position:absolute;top:14px;right:14px;
-    width:32px;height:32px;border:0;border-radius:50%;
-    background:var(--field);color:var(--text2);font-size:14px;
-    cursor:pointer;display:grid;place-items:center;
-    transition:background .2s,color .2s;
+    position:absolute;top:14px;right:14px;width:32px;height:32px;
+    border:0;border-radius:50%;background:var(--field);color:var(--text2);font-size:14px;
+    cursor:pointer;display:grid;place-items:center;transition:background .2s,color .2s;
   }
   .close:hover{background:var(--border-strong);color:var(--text)}
 
   .m-title{margin:0 0 8px;font-size:22px;font-weight:600;letter-spacing:-.02em}
   .m-sub{margin:0 0 24px;font-size:14px;color:var(--text2);line-height:1.5}
 
-  .q{font-size:18px;font-weight:500;letter-spacing:-.01em;margin-bottom:16px}
-  .emojis{
-    padding:14px 10px;margin-bottom:16px;
-    font-size:28px;line-height:1.35;word-break:break-word;
-    border-radius:16px;background:var(--field);user-select:none;
+  /* --- СЛАЙДЕР-КАПЧА --- */
+  .slider-wrap{
+    margin:0 0 20px;
+    padding:5px;
+    border-radius:18px;
+    background:var(--field);
+    border:1px solid var(--border-strong);
+    position:relative;
+    user-select:none;
+    -webkit-user-select:none;
   }
-  .input{
-    width:100%;padding:15px 16px;font:inherit;font-size:17px;text-align:center;
-    color:var(--text);background:var(--field);
-    border:1.5px solid transparent;border-radius:14px;
-    outline:none;-webkit-appearance:none;
-    transition:border-color .2s,box-shadow .2s,background .2s;
+  .slider-track{
+    position:relative;height:52px;border-radius:14px;
+    background:rgba(255,255,255,.04);
+    overflow:hidden;
+    cursor:ew-resize;
   }
-  .input::placeholder{color:var(--text2)}
-  .input:focus{background:var(--card-solid);border-color:var(--accent);box-shadow:0 0 0 4px rgba(10,132,255,.15)}
+  .slider-fill{
+    position:absolute;left:0;top:0;bottom:0;
+    background:linear-gradient(90deg,rgba(10,132,255,.25),rgba(94,92,230,.18));
+    border-radius:14px;
+    width:0;transition:background .3s;
+    pointer-events:none;
+  }
+  .slider-fill.done{
+    background:linear-gradient(90deg,rgba(48,209,88,.3),rgba(40,167,69,.2));
+  }
+  .slider-hint{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:500;color:var(--text3);
+    pointer-events:none;gap:7px;
+    transition:opacity .3s;
+  }
+  .slider-hint.hidden{opacity:0}
+  .slider-arrows{
+    display:inline-flex;gap:2px;opacity:.5;
+  }
+  .slider-thumb{
+    position:absolute;top:50%;transform:translateY(-50%);
+    left:0;
+    width:44px;height:44px;
+    border-radius:12px;
+    background:var(--card-solid);
+    border:1px solid var(--border-strong);
+    box-shadow:0 4px 14px rgba(0,0,0,.35);
+    display:grid;place-items:center;
+    cursor:grab;transition:box-shadow .2s,left .0s;
+    z-index:2;
+    touch-action:none;
+  }
+  .slider-thumb:active{cursor:grabbing}
+  .slider-thumb.released{
+    transition:left .3s cubic-bezier(.22,.61,.36,1),box-shadow .2s;
+  }
+  .slider-thumb.done{
+    background:linear-gradient(135deg,#30d158,#28a745);
+    border-color:rgba(48,209,88,.4);
+    box-shadow:0 4px 16px rgba(48,209,88,.4);
+    cursor:default;
+  }
+  .slider-thumb svg{width:18px;height:18px;stroke:var(--text2);transition:stroke .2s}
+  .slider-thumb.done svg{stroke:#fff}
 
-  .err{min-height:19px;margin:9px 2px 12px;font-size:13px;color:var(--red);text-align:center}
+  .err{min-height:18px;margin:6px 2px 12px;font-size:13px;color:var(--red);text-align:center;transition:opacity .2s}
   @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
   .shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
 
@@ -290,30 +283,12 @@
     background:linear-gradient(135deg,#0a84ff,#5e5ce6);
     box-shadow:0 6px 20px rgba(10,132,255,.3);
     -webkit-tap-highlight-color:transparent;
-    transition:transform .15s ease, box-shadow .3s ease, filter .3s ease;
-    will-change:transform;
+    transition:transform .15s,box-shadow .3s,filter .3s;will-change:transform;
   }
   .btn:hover{filter:brightness(1.08)}
   .btn:active{transform:scale(.97)}
-  .btn:disabled{opacity:.55;cursor:default;filter:none;transform:none;box-shadow:none}
+  .btn:disabled{opacity:.45;cursor:default;filter:none;transform:none;box-shadow:none}
   .btn.copied{background:linear-gradient(135deg,#30d158,#28a745);box-shadow:0 6px 20px rgba(48,209,88,.3)}
-
-  .success{width:64px;height:64px;margin:0 auto 20px}
-  .success circle,.success path{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-  .success circle{stroke-dasharray:166;stroke-dashoffset:166;animation:draw .6s cubic-bezier(.65,0,.45,1) forwards}
-  .success path{stroke-dasharray:48;stroke-dashoffset:48;animation:draw .4s .38s cubic-bezier(.65,0,.45,1) forwards}
-  @keyframes draw{to{stroke-dashoffset:0}}
-
-  .code-box{
-    padding:20px 16px;margin-bottom:18px;border-radius:18px;
-    background:var(--field);border:1.5px dashed var(--border-strong);
-  }
-  .code{
-    display:block;word-break:break-all;user-select:all;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    font-size:clamp(19px,5.4vw,23px);font-weight:600;letter-spacing:.06em;
-    color:var(--accent);
-  }
 
   .spinner{
     width:34px;height:34px;margin:12px auto 4px;border-radius:50%;
@@ -322,10 +297,22 @@
   }
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  footer{
-    padding:20px 0 50px;text-align:center;
-    font-size:13px;color:var(--text3);
+  /* Канвас с промокодом */
+  .code-canvas-wrap{
+    margin:0 0 18px;
+    border-radius:18px;overflow:hidden;
+    background:var(--field);border:1.5px dashed var(--border-strong);
   }
+  #codeCanvas{
+    display:block;width:100%;height:auto;
+    user-select:none;-webkit-user-select:none;
+  }
+
+  .success{width:64px;height:64px;margin:0 auto 20px}
+  .success circle,.success path{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  .success circle{stroke-dasharray:166;stroke-dashoffset:166;animation:draw .6s cubic-bezier(.65,0,.45,1) forwards}
+  .success path{stroke-dasharray:48;stroke-dashoffset:48;animation:draw .4s .38s cubic-bezier(.65,0,.45,1) forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
 
   .toast{
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
@@ -333,22 +320,20 @@
     padding:12px 20px;border-radius:100px;font-size:14px;font-weight:500;
     border:1px solid var(--border-strong);box-shadow:var(--shadow);
     z-index:200;opacity:0;
-    transition:transform .4s cubic-bezier(.22,.61,.36,1), opacity .3s;
+    transition:transform .4s cubic-bezier(.22,.61,.36,1),opacity .3s;
     pointer-events:none;
   }
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-  @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{
-      animation-duration:.01ms !important;animation-iteration-count:1 !important;
-      transition-duration:.01ms !important;
-    }
+  footer{padding:20px 0 50px;text-align:center;font-size:13px;color:var(--text3)}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
   }
   @media (max-width:400px){
     .modal{padding:34px 22px 26px;border-radius:24px}
     .card{padding:20px 18px 18px}
     .notify-banner{padding:12px 14px;gap:10px;border-radius:20px}
-    .notify-banner .txt{font-size:13px}
   }
 </style>
 </head>
@@ -365,8 +350,6 @@
       <span class="dot" id="statusDot"></span>
       <span id="countText">Загрузка…</span>
     </div>
-
-    <!-- Баннер уведомлений -->
     <div class="notify-banner" id="notifyBanner">
       <div class="bell" id="notifyBell">🔔</div>
       <div class="txt" id="notifyText">
@@ -403,104 +386,56 @@ const toast = $('toast');
 const notifyBanner = $('notifyBanner'), notifyBtn = $('notifyBtn');
 const notifyText = $('notifyText'), notifyBell = $('notifyBell');
 
-let lastFocused = null;
-let currentPromo = null;
-let lastIds = [];
+let lastFocused = null, currentPromo = null, lastIds = [];
 const freshUntil = new Map();
 
-// ---------- WEB NOTIFICATIONS ----------
+// ---------- УВЕДОМЛЕНИЯ ----------
 function updateNotifyBanner(){
-  const supported = 'Notification' in window;
-  if (!supported){
-    notifyBanner.classList.remove('show');
-    return;
-  }
+  if (!('Notification' in window)){ notifyBanner.classList.remove('show'); return; }
   const perm = Notification.permission;
-
   if (perm === 'granted'){
-    notifyBanner.classList.add('show', 'ok');
-    notifyBanner.classList.remove('blocked');
-    notifyBell.textContent = '🔔';
+    notifyBanner.classList.add('show','ok'); notifyBanner.classList.remove('blocked');
+    notifyBell.textContent = '\uD83D\uDD14';
     notifyText.innerHTML = '<b>Уведомления включены</b><span>Мы сообщим о новых промокодах</span>';
-    notifyBtn.textContent = 'Ок';
-    notifyBtn.onclick = () => notifyBanner.classList.remove('show');
-    return;
+    notifyBtn.textContent = 'Ок'; notifyBtn.onclick = () => notifyBanner.classList.remove('show'); return;
   }
   if (perm === 'denied'){
-    notifyBanner.classList.add('show', 'blocked');
-    notifyBanner.classList.remove('ok');
-    notifyBell.textContent = '🔕';
-    notifyText.innerHTML = '<b>Уведомления заблокированы</b><span>Разреши их в настройках браузера</span>';
-    notifyBtn.textContent = 'Скрыть';
-    notifyBtn.onclick = () => notifyBanner.classList.remove('show');
-    return;
+    notifyBanner.classList.add('show','blocked'); notifyBanner.classList.remove('ok');
+    notifyBell.textContent = '\uD83D\uDD15';
+    notifyText.innerHTML = '<b>Уведомления заблокированы</b><span>Разреши в настройках браузера</span>';
+    notifyBtn.textContent = 'Скрыть'; notifyBtn.onclick = () => notifyBanner.classList.remove('show'); return;
   }
-  // default
-  notifyBanner.classList.add('show');
-  notifyBanner.classList.remove('ok', 'blocked');
-  notifyBell.textContent = '🔔';
+  notifyBanner.classList.add('show'); notifyBanner.classList.remove('ok','blocked');
+  notifyBell.textContent = '\uD83D\uDD14';
   notifyText.innerHTML = '<b>Включи уведомления</b><span>Узнавай о новых промокодах первым</span>';
   notifyBtn.textContent = 'Включить';
   notifyBtn.onclick = async () => {
-    try {
-      const perm = await Notification.requestPermission();
-      updateNotifyBanner();
-      if (perm === 'granted'){
-        showBrowserNotification({
-          title: 'Уведомления включены 🎉',
-          body: 'Теперь ты узнаешь о новых промокодах первым!'
-        });
-      }
-    } catch {}
+    try { const p = await Notification.requestPermission(); updateNotifyBanner(); if (p === 'granted') showBrowserNotification({ title: 'Уведомления включены \uD83C\uDF89', body: 'Теперь ты узнаешь о новых промокодах первым!' }); } catch {}
   };
 }
-
 function showBrowserNotification({ title, body, tag }){
-  if (!('Notification' in window)) return;
-  if (Notification.permission !== 'granted') return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
   try {
-    const n = new Notification(title, {
-      body,
-      tag: tag || 'standknife-promo',
-      icon: '/icon.png',
-      badge: '/icon.png',
-      silent: false
-    });
-    n.onclick = () => {
-      window.focus();
-      n.close();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    const n = new Notification(title, { body, tag: tag || 'promo', icon: '/icon.png', silent: false });
+    n.onclick = () => { window.focus(); n.close(); };
     setTimeout(() => { try { n.close(); } catch {} }, 12000);
-  } catch (e){
-    // fallback — некоторые браузеры требуют service worker
-  }
+  } catch {}
 }
 
 // ---------- API ----------
 async function api(path, opts){
   const ctrl = new AbortController();
-  const timeout = setTimeout(() => ctrl.abort(), 60000);
+  const timeout = setTimeout(() => ctrl.abort(), 30000);
   try {
-    const res = await fetch(path, {
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-      signal: ctrl.signal,
-      ...opts
-    });
+    const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, cache: 'no-store', signal: ctrl.signal, ...opts });
     clearTimeout(timeout);
-    let data = null;
-    try { data = await res.json(); } catch {}
+    let data = null; try { data = await res.json(); } catch {}
     return { ok: res.ok, status: res.status, data };
-  } catch (e){
-    clearTimeout(timeout);
-    return { ok: false, status: 0, data: null };
-  }
+  } catch (e) { clearTimeout(timeout); return { ok: false, status: 0, data: null }; }
 }
 
 function showToast(text){
-  toast.textContent = text;
-  toast.classList.add('show');
+  toast.textContent = text; toast.classList.add('show');
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => toast.classList.remove('show'), 2500);
 }
@@ -508,22 +443,21 @@ function showToast(text){
 function timeAgo(iso){
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (diff < 10) return 'только что';
-  if (diff < 60) return `${diff} сек назад`;
+  if (diff < 60)  return `${diff} сек назад`;
   if (diff < 3600) return `${Math.floor(diff/60)} мин назад`;
   if (diff < 86400) return `${Math.floor(diff/3600)} ч назад`;
   if (diff < 604800) return `${Math.floor(diff/86400)} дн назад`;
-  return new Date(iso).toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
+  return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 }
 
 function gameEmoji(name){
-  const list = ['🎮','🔪','⚔️','🎯','🏆','💎','🔥','⚡','🎲','🚀','👾','🎪'];
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  const list = ['\uD83C\uDFAE','\uD83D\uDD2A','\u2694\uFE0F','\uD83C\uDFAF','\uD83C\uDFC6','\uD83D\uDC8E','\uD83D\uDD25','\u26A1','\uD83C\uDFB2','\uD83D\uDE80','\uD83D\uDC7E','\uD83C\uDFAA'];
+  let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
   return list[Math.abs(h) % list.length];
 }
 
 function esc(s){
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
 async function loadPromos({ silent } = {}){
@@ -534,90 +468,9 @@ async function loadPromos({ silent } = {}){
     renderGrid(data.promos || [], data.game || 'Standknife', silent);
   } catch {
     if (!silent){
-      grid.innerHTML = `<div class="empty">Не удалось загрузить промокоды.<br>Потяни вниз, чтобы обновить.</div>`;
+      grid.innerHTML = '<div class="empty">Не удалось загрузить промокоды.</div>';
       countText.textContent = 'Ошибка соединения';
       statusDot.classList.add('off');
-    }
-  }
-}
-
-function renderGrid(promos, game, silent){
-  const ids = promos.map(p => p.id);
-  const isFirstLoad = lastIds.length === 0;
-  const added = ids.filter(id => !lastIds.includes(id));
-  const removed = lastIds.filter(id => !ids.includes(id));
-
-  // если ничего не изменилось — не перерисовываем (защита от мигания)
-  if (silent && added.length === 0 && removed.length === 0 && grid.children.length === promos.length) {
-    return;
-  }
-
-  const now = Date.now();
-  for (const id of added) freshUntil.set(id, now + 8000);
-  lastIds = ids;
-
-  if (!promos.length){
-    grid.innerHTML = `<div class="empty">Пока нет ни одного промокода.<br>Заходи позже 👀</div>`;
-    countText.textContent = 'Ожидаем первый промокод';
-    return;
-  }
-
-  countText.textContent = `Доступно ${promos.length} ${plural(promos.length, 'промокод', 'промокода', 'промокодов')}`;
-
-  grid.innerHTML = promos.map((p, i) => {
-    const fresh = (freshUntil.get(p.id) || 0) > now;
-    return `
-      <article class="card ${fresh ? 'fresh' : ''}" style="animation-delay:${Math.min(i*50, 400)}ms" data-id="${esc(p.id)}">
-        <div class="card-top">
-          <div class="game-icon">${gameEmoji(p.game)}</div>
-          <span class="badge ${fresh ? 'new' : ''}">${fresh ? '🆕 Новый' : esc(p.game)}</span>
-        </div>
-        <h3 class="game-name">Промокод на ${esc(p.game)}</h3>
-        <div class="meta">
-          <span class="meta-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-            </svg>
-            <span class="channel">${esc(p.channel)}</span>
-          </span>
-          <span class="meta-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-            <span data-added="${esc(p.addedAt)}">${timeAgo(p.addedAt)}</span>
-          </span>
-        </div>
-        <button class="reveal" data-id="${esc(p.id)}">Получить промокод</button>
-      </article>
-    `;
-  }).join('');
-
-  grid.querySelectorAll('.reveal').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const promo = promos.find(x => x.id === btn.dataset.id);
-      if (promo) openForPromo(promo);
-    });
-  });
-
-  // новые промокоды (не при первой загрузке)
-  if (!isFirstLoad && added.length > 0){
-    showToast('🔔 Новый промокод на сайте!');
-
-    // браузерное уведомление
-    const newPromos = promos.filter(p => added.includes(p.id));
-    if (newPromos.length === 1){
-      const p = newPromos[0];
-      showBrowserNotification({
-        title: '🔔 Новый промокод!',
-        body: `${p.game} — от ${p.channel}. Открой сайт, чтобы получить код.`,
-        tag: 'promo-' + p.id
-      });
-    } else if (newPromos.length > 1){
-      showBrowserNotification({
-        title: `🔔 ${newPromos.length} новых промокода!`,
-        body: newPromos.slice(0, 3).map(p => `${p.game} — ${p.channel}`).join('\n'),
-        tag: 'promo-multi-' + Date.now()
-      });
     }
   }
 }
@@ -629,40 +482,87 @@ function plural(n, one, two, many){
   return many;
 }
 
-setInterval(() => {
-  document.querySelectorAll('[data-added]').forEach(el => {
-    el.textContent = timeAgo(el.dataset.added);
+function renderGrid(promos, game, silent){
+  const ids = promos.map(p => p.id);
+  const isFirstLoad = lastIds.length === 0;
+  const added = ids.filter(id => !lastIds.includes(id));
+  if (silent && added.length === 0 && !lastIds.filter(id => !ids.includes(id)).length && grid.children.length === promos.length) return;
+
+  const now = Date.now();
+  for (const id of added) freshUntil.set(id, now + 8000);
+  lastIds = ids;
+
+  if (!promos.length){
+    grid.innerHTML = '<div class="empty">Пока нет ни одного промокода.<br>Заходи позже \uD83D\uDC40</div>';
+    countText.textContent = 'Ожидаем первый промокод';
+    return;
+  }
+
+  countText.textContent = `Доступно ${promos.length} ${plural(promos.length, 'промокод', 'промокода', 'промокодов')}`;
+
+  grid.innerHTML = promos.map((p, i) => {
+    const fresh = (freshUntil.get(p.id) || 0) > now;
+    return `
+      <article class="card ${fresh ? 'fresh' : ''}" style="animation-delay:${Math.min(i*50,400)}ms" data-id="${esc(p.id)}">
+        <div class="card-top">
+          <div class="game-icon">${gameEmoji(p.game)}</div>
+          <span class="badge ${fresh ? 'new' : ''}">${fresh ? '\uD83C\uDD95 Новый' : esc(p.game)}</span>
+        </div>
+        <h3 class="game-name">Промокод на ${esc(p.game)}</h3>
+        <div class="meta">
+          <span class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span class="channel">${esc(p.channel)}</span>
+          </span>
+          <span class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span data-added="${esc(p.addedAt)}">${timeAgo(p.addedAt)}</span>
+          </span>
+        </div>
+        <button class="reveal" data-id="${esc(p.id)}">Получить промокод</button>
+      </article>`;
+  }).join('');
+
+  grid.querySelectorAll('.reveal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const promo = promos.find(x => x.id === btn.dataset.id);
+      if (promo) openForPromo(promo);
+    });
   });
+
+  if (!isFirstLoad && added.length > 0){
+    showToast('\uD83D\uDD14 Новый промокод на сайте!');
+    const newPs = promos.filter(p => added.includes(p.id));
+    if (newPs.length === 1)
+      showBrowserNotification({ title: '\uD83D\uDD14 Новый промокод!', body: `${newPs[0].game} — от ${newPs[0].channel}`, tag: 'promo-'+newPs[0].id });
+    else if (newPs.length > 1)
+      showBrowserNotification({ title: `\uD83D\uDD14 ${newPs.length} новых промокода!`, body: newPs.slice(0,3).map(p => `${p.game} — ${p.channel}`).join('\n'), tag: 'promo-multi-'+Date.now() });
+  }
+}
+
+setInterval(() => {
+  document.querySelectorAll('[data-added]').forEach(el => { el.textContent = timeAgo(el.dataset.added); });
 }, 30_000);
 
 function openOverlay(){
   lastFocused = document.activeElement;
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden', 'false');
+  overlay.classList.add('show'); overlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 }
 function closeOverlay(){
-  overlay.classList.remove('show');
-  overlay.setAttribute('aria-hidden', 'true');
+  overlay.classList.remove('show'); overlay.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
   if (lastFocused && lastFocused.focus) lastFocused.focus();
 }
 closeBtn.addEventListener('click', closeOverlay);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay(); });
 
 function renderLoading(){
-  modalBody.innerHTML = `<div class="spinner"></div><h2 class="m-title" id="modalTitle">Секунду…</h2><p class="m-sub">Готовим проверку</p>`;
+  modalBody.innerHTML = '<div class="spinner"></div><h2 class="m-title" id="modalTitle">Секунду…</h2><p class="m-sub">Готовимся</p>';
 }
-
 function renderError(title, text, retry){
-  modalBody.innerHTML = `
-    <h2 class="m-title" id="modalTitle">${esc(title)}</h2>
-    <p class="m-sub">${esc(text)}</p>
-    ${retry ? `<button class="btn" id="retryBtn" type="button">Попробовать снова</button>` : ''}
-  `;
+  modalBody.innerHTML = `<h2 class="m-title" id="modalTitle">${esc(title)}</h2><p class="m-sub">${esc(text)}</p>${retry ? '<button class="btn" id="retryBtn">Попробовать снова</button>' : ''}`;
   if (retry) $('retryBtn').addEventListener('click', () => openForPromo(currentPromo));
 }
 
@@ -670,161 +570,268 @@ async function openForPromo(promo){
   currentPromo = promo;
   renderLoading();
   openOverlay();
-
-  let lastErr = null;
-  for (let attempt = 0; attempt < 3; attempt++){
-    try {
-      const { ok, status, data } = await api('/api/captcha', { method: 'POST' });
-      if (ok && data && data.q){
-        return renderCaptcha(data);
-      }
-      if (status === 429){
-        lastErr = 'Слишком много запросов';
-        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
-        continue;
-      }
-      lastErr = 'Сервер не ответил';
-    } catch (e){
-      lastErr = 'Сеть недоступна';
-    }
-    if (attempt < 2) await new Promise(r => setTimeout(r, 1200 * (attempt + 1)));
-  }
-
-  renderError('Не получилось', lastErr + '. Попробуй ещё раз через пару секунд.', true);
+  renderSlider();
 }
 
-function renderCaptcha(c){
+// ===== СЛАЙДЕР-КАПЧА =====
+// Боты и скрипты не имитируют человеческое движение мыши с постепенным ускоႈением и диспеႈсией.
+// Сеႈвеႈ также пႈовеႈяет: duration >= 280мс, eventCount >= 5, variance >= 0.08.
+function renderSlider(){
   modalBody.innerHTML = `
-    <h2 class="m-title" id="modalTitle">Проверка</h2>
-    <p class="m-sub">Ответь на вопрос, чтобы получить промокод</p>
-
-    <div class="q">${esc(c.q)}</div>
-    ${c.display ? `<div class="emojis">${esc(c.display)}</div>` : ''}
-
-    <input id="answer" class="input" type="text" inputmode="numeric"
-           autocomplete="off" autocorrect="off" spellcheck="false"
-           placeholder="Ответ" aria-label="Ответ">
-
-    <div class="err" id="err" role="alert" aria-live="polite"></div>
-    <button class="btn" id="checkBtn" type="button">Проверить</button>
+    <h2 class="m-title" id="modalTitle">Пႈовеႈка</h2>
+    <p class="m-sub">Пеႈетащи движку впႈаво до конца, чтобы получить пႈомокод</p>
+    <div class="slider-wrap" id="sliderWrap">
+      <div class="slider-track" id="sliderTrack">
+        <div class="slider-fill" id="sliderFill"></div>
+        <div class="slider-hint" id="sliderHint">
+          <span class="slider-arrows">›››</span>
+          <span>Потяни</span>
+        </div>
+        <div class="slider-thumb" id="sliderThumb">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="err" id="sliderErr"></div>
   `;
 
-  const input = $('answer'), errEl = $('err'), checkBtn = $('checkBtn');
-  setTimeout(() => input.focus(), 320);
+  const track = $('sliderTrack');
+  const thumb = $('sliderThumb');
+  const fill  = $('sliderFill');
+  const hint  = $('sliderHint');
+  const errEl = $('sliderErr');
 
-  const shake = el => { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); };
+  const THUMB_W  = 44; // px (шиႈина ползунка в CSS)
+  const THRESHOLD = 0.88; // доля тႈека котоႈую нужно пႈойти
 
-  async function submit(){
-    const val = input.value.trim();
-    if (!val){ errEl.textContent = 'Введите ответ'; shake(input); return; }
-    checkBtn.disabled = true;
-    checkBtn.textContent = 'Проверяем…';
+  let dragging = false;
+  let startX = 0, startLeft = 0;
+  let startTime = 0;
+  let positions = [];   // [{x, t}]
+  let isDone = false;
+
+  function getTrackWidth(){ return track.getBoundingClientRect().width; }
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+  function getRatio(){ return parseFloat(thumb.style.left) / (getTrackWidth() - THUMB_W); }
+
+  function setLeft(px){
+    thumb.style.left = px + 'px';
+    fill.style.width  = (px + THUMB_W) + 'px';
+    if (px > 8) hint.classList.add('hidden');
+    else hint.classList.remove('hidden');
+  }
+
+  // Инициализация: ползунок на 0
+  setLeft(0);
+
+  function onStart(clientX){
+    if (isDone) return;
+    dragging = true;
+    startX = clientX;
+    startLeft = parseFloat(thumb.style.left) || 0;
+    startTime = Date.now();
+    positions = [{ x: clientX, t: startTime }];
+    errEl.textContent = '';
+  }
+
+  function onMove(clientX){
+    if (!dragging || isDone) return;
+    const trackW = getTrackWidth();
+    const maxLeft = trackW - THUMB_W;
+    const newLeft = clamp(startLeft + (clientX - startX), 0, maxLeft);
+    setLeft(newLeft);
+    const now = Date.now();
+    positions.push({ x: clientX, t: now });
+    // Огႈаничиваем размеႈ массива в памяти
+    if (positions.length > 300) positions = positions.slice(-150);
+  }
+
+  function onEnd(){
+    if (!dragging || isDone) return;
+    dragging = false;
+    const trackW = getTrackWidth();
+    const ratio  = parseFloat(thumb.style.left) / (trackW - THUMB_W);
+    const duration = Date.now() - startTime;
+
+    if (ratio < THRESHOLD){
+      // Не дотянул — возвႈащаем назад
+      thumb.classList.add('released');
+      setLeft(0);
+      setTimeout(() => thumb.classList.remove('released'), 350);
+      return;
+    }
+
+    // Дотянул — считаем статистику движения
+    const eventCount = positions.length;
+    // Диспеႈсия шагов (насколько неႈавномеႈное движение)
+    let variance = 0;
+    if (positions.length >= 3){
+      const deltas = [];
+      for (let i = 1; i < positions.length; i++){
+        const dt = positions[i].t - positions[i-1].t;
+        const dx = Math.abs(positions[i].x - positions[i-1].x);
+        if (dt > 0) deltas.push(dx / dt);
+      }
+      if (deltas.length >= 2){
+        const mean = deltas.reduce((s,v) => s+v, 0) / deltas.length;
+        const sq   = deltas.reduce((s,v) => s + (v-mean)**2, 0) / deltas.length;
+        const std  = Math.sqrt(sq);
+        variance = mean > 0 ? std / mean : 0;
+      }
+    }
+
+    // Закончиваем доводим до конца
+    isDone = true;
+    thumb.classList.add('done');
+    fill.classList.add('done');
+    hint.classList.add('hidden');
+    thumb.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    // Отпႈавляем на сеႈвеႈ
+    verifyAndReveal({ duration, eventCount, variance });
+  }
+
+  // Mouse
+  thumb.addEventListener('mousedown', e => { e.preventDefault(); onStart(e.clientX); });
+  document.addEventListener('mousemove', e => onMove(e.clientX));
+  document.addEventListener('mouseup', () => onEnd());
+
+  // Touch
+  thumb.addEventListener('touchstart', e => { e.preventDefault(); onStart(e.touches[0].clientX); }, { passive: false });
+  document.addEventListener('touchmove', e => { if (dragging) onMove(e.touches[0].clientX); }, { passive: true });
+  document.addEventListener('touchend', () => onEnd());
+
+  async function verifyAndReveal({ duration, eventCount, variance }){
+    // Пеႈецвет ползунка, пока ждём
+    const { ok: vOk, status: vSt, data: vData } = await api('/api/verify-slider', {
+      method: 'POST',
+      body: JSON.stringify({ duration, eventCount, variance })
+    });
+
+    if (!vOk){
+      if (vSt === 429){ renderError('Слишком много попыток', 'Попႈобуй чеႈез немного', false); return; }
+      renderError('Ошибка', 'Попႈобуй ещё ႈаз', true); return;
+    }
+
+    const token = vData && vData.token;
+    if (!token){ renderError('Ошибка', 'Попႈобуй ещё ႈаз', true); return; }
 
     const { ok, status, data } = await api('/api/reveal', {
       method: 'POST',
-      body: JSON.stringify({ captchaId: c.id, answer: val, promoId: currentPromo.id })
+      body: JSON.stringify({ token, promoId: currentPromo.id })
     });
 
     if (ok && data && data.code){ renderCode(data); return; }
-
-    checkBtn.disabled = false;
-    checkBtn.textContent = 'Проверить';
-
-    if (status === 404){
-      closeOverlay();
-      loadPromos();
-      return;
-    }
-    if (status === 429){
-      return renderError('Слишком много попыток', 'Попробуй позже', false);
-    }
-    if (data && data.error === 'wrong_answer'){
-      errEl.textContent = 'Неверно, попробуй ещё раз';
-      input.value = '';
-      input.focus();
-      shake(input);
-      return;
-    }
-    openForPromo(currentPromo);
+    if (status === 404){ closeOverlay(); loadPromos(); return; }
+    if (status === 429){ renderError('Слишком много попыток', 'Попႈобуй чеႈез немного', false); return; }
+    renderError('Не получилось', 'Попႈобуй ещё ႈаз', true);
   }
-
-  checkBtn.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
-  input.addEventListener('input', () => { if (errEl.textContent) errEl.textContent = ''; });
 }
 
+// ===== Пႈомокод на Canvas =====
+// Canvas защищает код от паႈсинга (getComputedStyle/innerHTML/селекция) — виден только визуально.
 function renderCode({ code, game, channel }){
   modalBody.innerHTML = `
     <svg class="success" viewBox="0 0 52 52" aria-hidden="true">
       <circle cx="26" cy="26" r="24"/>
       <path d="M14 27l8 8 16-16"/>
     </svg>
-    <h2 class="m-title" id="modalTitle">Промокод для ${esc(game)}</h2>
-    <p class="m-sub">Скопируй и активируй в игре${channel ? `<br>От канала <b>${esc(channel)}</b>` : ''}</p>
-    <div class="code-box"><span class="code" id="codeText">${esc(code)}</span></div>
-    <button class="btn" id="copyBtn" type="button">Скопировать код</button>
+    <h2 class="m-title" id="modalTitle">Пႈомокод для ${esc(game)}</h2>
+    <p class="m-sub">Скопиႈуй и активиႈуй в игႈе${channel ? `<br>От канала <b>${esc(channel)}</b>` : ''}</p>
+    <div class="code-canvas-wrap">
+      <canvas id="codeCanvas" aria-label="Пႈомокод"></canvas>
+    </div>
+    <button class="btn" id="copyBtn">Скопиႈовать код</button>
   `;
+
+  const canvas = $('codeCanvas');
+  drawCode(canvas, code);
 
   const copyBtn = $('copyBtn');
   copyBtn.addEventListener('click', async () => {
     const ok = await copyText(code);
-    copyBtn.textContent = ok ? 'Скопировано ✓' : 'Выдели вручную';
+    copyBtn.textContent = ok ? 'Скопиႈовано ✓' : 'Выдели вႈучную';
     if (ok) copyBtn.classList.add('copied');
-    setTimeout(() => {
-      copyBtn.textContent = 'Скопировать код';
-      copyBtn.classList.remove('copied');
-    }, 1900);
+    setTimeout(() => { copyBtn.textContent = 'Скопиႈовать код'; copyBtn.classList.remove('copied'); }, 1900);
   });
+}
+
+function drawCode(canvas, code){
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const W = 360, H = 80;
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(DPR, DPR);
+
+  // Фон
+  ctx.clearRect(0, 0, W, H);
+
+  // Шум пикселей (не позволяет распознавать OCR код чеႈез пиксельный анализ)
+  const imgData = ctx.createImageData(W, H);
+  for (let i = 0; i < imgData.data.length; i += 4){
+    const v = Math.floor(Math.random() * 6);
+    imgData.data[i] = imgData.data[i+1] = imgData.data[i+2] = v;
+    imgData.data[i+3] = 12;
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  // Текст
+  const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  ctx.fillStyle = isDark ? '#60a5fa' : '#0071e3';
+  ctx.font = `700 ${Math.min(28, Math.floor(W * 0.075))}px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Лёгкая ႈазвертка текста (пႈотив скႈиптов)
+  const angle = (Math.random() - 0.5) * 0.04;
+  ctx.save();
+  ctx.translate(W/2, H/2);
+  ctx.rotate(angle);
+  ctx.fillText(code, 0, 0);
+  ctx.restore();
+
+  // Линия повеႈх текста (anti-OCR)
+  ctx.strokeStyle = isDark ? 'rgba(96,165,250,.18)' : 'rgba(0,113,227,.14)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(20, H/2 + (Math.random()-0.5)*8);
+  ctx.lineTo(W-20, H/2 + (Math.random()-0.5)*8);
+  ctx.stroke();
 }
 
 async function copyText(text){
   try { if (navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; } } catch {}
   try {
     const ta = document.createElement('textarea');
-    ta.value = text; ta.setAttribute('readonly', '');
+    ta.value = text; ta.setAttribute('readonly','');
     ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
-    document.body.appendChild(ta);
-    ta.select();
-    const ok = document.execCommand('copy');
-    ta.remove();
-    return ok;
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy'); ta.remove(); return ok;
   } catch { return false; }
 }
 
 // ---------- SSE ----------
-// Работает мгновенно, если соединение установилось.
-// Если сервер перегружен (503) — EventSource сам повторит через 5 сек,
-// а fallback-опрос ниже всё равно обновит данные раз в 5 секунд.
 function connectSSE(){
-  let es;
-  try { es = new EventSource('/api/events'); }
-  catch { return; }
-
-  es.onmessage = (e) => {
-    let msg;
-    try { msg = JSON.parse(e.data); } catch { return; }
-
-    if (msg.type === 'promo-added' || msg.type === 'promo-removed' || msg.type === 'user-updated'){
-      loadPromos({ silent: true });
-    }
+  let es; try { es = new EventSource('/api/events'); } catch { return; }
+  es.onmessage = e => {
+    let msg; try { msg = JSON.parse(e.data); } catch { return; }
+    if (['promo-added','promo-removed','user-updated'].includes(msg.type)) loadPromos({ silent: true });
   };
-
-  es.onerror = () => {
-    // Ничего не делаем: EventSource переподключится сам.
-    // Fallback-опрос внизу страницы продолжит обновлять данные каждые 5 сек.
-  };
+  es.onerror = () => {};
 }
 
-// ---------- СТАРТ ----------
+// ---------- Стаႈт ----------
 updateNotifyBanner();
 loadPromos();
 connectSSE();
-// fallback: обновляемся каждые 5 секунд даже если SSE не работает
 setInterval(() => loadPromos({ silent: true }), 5_000);
-// при возврате на вкладку — мгновенно
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) loadPromos({ silent: true });
-});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadPromos({ silent: true }); });
 </script>
 </body>
 </html>
