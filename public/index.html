@@ -47,8 +47,6 @@
     overflow-x:hidden;
     -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   }
-​
-  /* Фон с плывущими шарами */
   .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
   .bg::before,.bg::after{
     content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;will-change:transform;
@@ -66,9 +64,9 @@
   @media (prefers-color-scheme:light){.bg::before,.bg::after{opacity:.28}}
   @keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(4vmax,3vmax,0) scale(1.08)}}
   @keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-4vmax,-3vmax,0) scale(1.12)}}
-​
+
   .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 22px}
-​
+
   header.hero{padding:80px 0 40px;text-align:center;animation:enter .8s cubic-bezier(.22,.61,.36,1) both}
   @keyframes enter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
   .eyebrow{
@@ -95,8 +93,7 @@
   }
   .counter .dot.off{background:var(--text3);animation:none}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.6)}70%{box-shadow:0 0 0 8px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
-​
-  /* Баннер уведомлений */
+
   .notify-banner{
     display:none;align-items:center;gap:14px;
     margin:24px auto 0;max-width:520px;padding:14px 20px;
@@ -129,14 +126,14 @@
   .notify-banner.ok .bell{background:linear-gradient(135deg,#30d158,#28a745);box-shadow:0 6px 16px rgba(48,209,88,.3)}
   .notify-banner.blocked{background:linear-gradient(135deg,rgba(255,159,10,.14),rgba(255,69,58,.14));border-color:rgba(255,159,10,.3)}
   .notify-banner.blocked .bell{background:linear-gradient(135deg,#ff9f0a,#ff453a);box-shadow:0 6px 16px rgba(255,159,10,.3)}
-​
+
   .section{padding:32px 0 80px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
   .empty{
     padding:60px 20px;text-align:center;color:var(--text2);
     font-size:15px;border:1.5px dashed var(--border-strong);border-radius:24px;grid-column:1/-1;
   }
-​
+
   .card{
     position:relative;padding:22px 22px 20px;border-radius:22px;
     background:var(--card);border:1px solid var(--border);
@@ -151,7 +148,7 @@
   @media (hover:hover){.card:hover{transform:translateY(-4px);background:var(--card-hover);border-color:var(--border-strong)}}
   .card.fresh{animation:cardIn .55s cubic-bezier(.22,.61,.36,1) both,glow 2.4s ease-out}
   @keyframes glow{0%{box-shadow:0 0 0 0 rgba(10,132,255,.5),var(--shadow-card)}100%{box-shadow:0 0 0 20px rgba(10,132,255,0),var(--shadow-card)}}
-​
+
   .card-top{display:flex;align-items:center;justify-content:space-between}
   .game-icon{
     width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:22px;
@@ -168,7 +165,7 @@
   .meta-item{display:inline-flex;align-items:center;gap:5px}
   .meta-item svg{width:13px;height:13px;flex-shrink:0;opacity:.7}
   .channel{color:var(--accent);font-weight:500}
-​
+
   .reveal{
     margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;
     width:100%;padding:13px 22px;border:0;border-radius:100px;cursor:pointer;
@@ -180,8 +177,7 @@
   }
   .reveal:hover{filter:brightness(1.08);box-shadow:0 10px 26px rgba(10,132,255,.4)}
   .reveal:active{transform:scale(.97)}
-​
-  /* Оверлей */
+
   .overlay{
     position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
     background:var(--overlay);
@@ -205,64 +201,44 @@
     cursor:pointer;display:grid;place-items:center;transition:background .2s,color .2s;
   }
   .close:hover{background:var(--border-strong);color:var(--text)}
-​
+
   .m-title{margin:0 0 8px;font-size:22px;font-weight:600;letter-spacing:-.02em}
   .m-sub{margin:0 0 24px;font-size:14px;color:var(--text2);line-height:1.5}
-​
-  /* --- СЛАЙДЕР-КАПЧА --- */
+
   .slider-wrap{
-    margin:0 0 20px;
-    padding:5px;
-    border-radius:18px;
-    background:var(--field);
-    border:1px solid var(--border-strong);
-    position:relative;
-    user-select:none;
-    -webkit-user-select:none;
+    margin:0 0 20px;padding:5px;border-radius:18px;
+    background:var(--field);border:1px solid var(--border-strong);
+    position:relative;user-select:none;-webkit-user-select:none;
   }
   .slider-track{
     position:relative;height:52px;border-radius:14px;
     background:rgba(255,255,255,.04);
-    overflow:hidden;
-    cursor:ew-resize;
+    overflow:hidden;cursor:ew-resize;
   }
   .slider-fill{
     position:absolute;left:0;top:0;bottom:0;
     background:linear-gradient(90deg,rgba(10,132,255,.25),rgba(94,92,230,.18));
-    border-radius:14px;
-    width:0;transition:background .3s;
-    pointer-events:none;
+    border-radius:14px;width:0;transition:background .3s;pointer-events:none;
   }
-  .slider-fill.done{
-    background:linear-gradient(90deg,rgba(48,209,88,.3),rgba(40,167,69,.2));
-  }
+  .slider-fill.done{background:linear-gradient(90deg,rgba(48,209,88,.3),rgba(40,167,69,.2))}
   .slider-hint{
     position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     font-size:13px;font-weight:500;color:var(--text3);
-    pointer-events:none;gap:7px;
-    transition:opacity .3s;
+    pointer-events:none;gap:7px;transition:opacity .3s;
   }
   .slider-hint.hidden{opacity:0}
-  .slider-arrows{
-    display:inline-flex;gap:2px;opacity:.5;
-  }
+  .slider-arrows{display:inline-flex;gap:2px;opacity:.5}
   .slider-thumb{
-    position:absolute;top:50%;transform:translateY(-50%);
-    left:0;
-    width:44px;height:44px;
-    border-radius:12px;
-    background:var(--card-solid);
-    border:1px solid var(--border-strong);
+    position:absolute;top:50%;transform:translateY(-50%);left:0;
+    width:44px;height:44px;border-radius:12px;
+    background:var(--card-solid);border:1px solid var(--border-strong);
     box-shadow:0 4px 14px rgba(0,0,0,.35);
     display:grid;place-items:center;
-    cursor:grab;transition:box-shadow .2s,left .0s;
-    z-index:2;
-    touch-action:none;
+    cursor:grab;transition:box-shadow .2s,left 0s;
+    z-index:2;touch-action:none;
   }
   .slider-thumb:active{cursor:grabbing}
-  .slider-thumb.released{
-    transition:left .3s cubic-bezier(.22,.61,.36,1),box-shadow .2s;
-  }
+  .slider-thumb.released{transition:left .3s cubic-bezier(.22,.61,.36,1),box-shadow .2s}
   .slider-thumb.done{
     background:linear-gradient(135deg,#30d158,#28a745);
     border-color:rgba(48,209,88,.4);
@@ -271,11 +247,11 @@
   }
   .slider-thumb svg{width:18px;height:18px;stroke:var(--text2);transition:stroke .2s}
   .slider-thumb.done svg{stroke:#fff}
-​
+
   .err{min-height:18px;margin:6px 2px 12px;font-size:13px;color:var(--red);text-align:center;transition:opacity .2s}
   @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
   .shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
-​
+
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     width:100%;padding:15px 26px;border:0;border-radius:100px;cursor:pointer;
@@ -289,15 +265,14 @@
   .btn:active{transform:scale(.97)}
   .btn:disabled{opacity:.45;cursor:default;filter:none;transform:none;box-shadow:none}
   .btn.copied{background:linear-gradient(135deg,#30d158,#28a745);box-shadow:0 6px 20px rgba(48,209,88,.3)}
-​
+
   .spinner{
     width:34px;height:34px;margin:12px auto 4px;border-radius:50%;
     border:3px solid var(--border-strong);border-top-color:var(--accent);
     animation:spin .8s linear infinite;
   }
   @keyframes spin{to{transform:rotate(360deg)}}
-​
-  /* Канвас с промокодом */
+
   .code-canvas-wrap{
     margin:0 0 18px;
     border-radius:18px;overflow:hidden;
@@ -307,13 +282,13 @@
     display:block;width:100%;height:auto;
     user-select:none;-webkit-user-select:none;
   }
-​
+
   .success{width:64px;height:64px;margin:0 auto 20px}
   .success circle,.success path{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
   .success circle{stroke-dasharray:166;stroke-dashoffset:166;animation:draw .6s cubic-bezier(.65,0,.45,1) forwards}
   .success path{stroke-dasharray:48;stroke-dashoffset:48;animation:draw .4s .38s cubic-bezier(.65,0,.45,1) forwards}
   @keyframes draw{to{stroke-dashoffset:0}}
-​
+
   .toast{
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
     background:var(--card-solid);color:var(--text);
@@ -324,9 +299,9 @@
     pointer-events:none;
   }
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-​
+
   footer{padding:20px 0 50px;text-align:center;font-size:13px;color:var(--text3)}
-​
+
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
   }
@@ -338,9 +313,9 @@
 </style>
 </head>
 <body>
-​
+
 <div class="bg" aria-hidden="true"></div>
-​
+
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Актуально</span>
@@ -359,58 +334,58 @@
       <button id="notifyBtn">Включить</button>
     </div>
   </header>
-​
+
   <section class="section">
     <div class="grid" id="grid"></div>
   </section>
-​
+
   <footer>Данные обновляются автоматически</footer>
 </div>
-​
+
 <div class="overlay" id="overlay" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <button class="close" id="closeBtn" aria-label="Закрыть">✕</button>
     <div id="modalBody"></div>
   </div>
 </div>
-​
+
 <div class="toast" id="toast"></div>
-​
+
 <script>
 'use strict';
-​
+
 const $ = id => document.getElementById(id);
 const overlay = $('overlay'), modalBody = $('modalBody'), closeBtn = $('closeBtn');
 const grid = $('grid'), countText = $('countText'), statusDot = $('statusDot');
 const toast = $('toast');
 const notifyBanner = $('notifyBanner'), notifyBtn = $('notifyBtn');
 const notifyText = $('notifyText'), notifyBell = $('notifyBell');
-​
+
 let lastFocused = null, currentPromo = null, lastIds = [];
 const freshUntil = new Map();
-​
+
 // ---------- УВЕДОМЛЕНИЯ ----------
 function updateNotifyBanner(){
   if (!('Notification' in window)){ notifyBanner.classList.remove('show'); return; }
   const perm = Notification.permission;
   if (perm === 'granted'){
     notifyBanner.classList.add('show','ok'); notifyBanner.classList.remove('blocked');
-    notifyBell.textContent = '\uD83D\uDD14';
+    notifyBell.textContent = '🔔';
     notifyText.innerHTML = '<b>Уведомления включены</b><span>Мы сообщим о новых промокодах</span>';
     notifyBtn.textContent = 'Ок'; notifyBtn.onclick = () => notifyBanner.classList.remove('show'); return;
   }
   if (perm === 'denied'){
     notifyBanner.classList.add('show','blocked'); notifyBanner.classList.remove('ok');
-    notifyBell.textContent = '\uD83D\uDD15';
+    notifyBell.textContent = '🔕';
     notifyText.innerHTML = '<b>Уведомления заблокированы</b><span>Разреши в настройках браузера</span>';
     notifyBtn.textContent = 'Скрыть'; notifyBtn.onclick = () => notifyBanner.classList.remove('show'); return;
   }
   notifyBanner.classList.add('show'); notifyBanner.classList.remove('ok','blocked');
-  notifyBell.textContent = '\uD83D\uDD14';
+  notifyBell.textContent = '🔔';
   notifyText.innerHTML = '<b>Включи уведомления</b><span>Узнавай о новых промокодах первым</span>';
   notifyBtn.textContent = 'Включить';
   notifyBtn.onclick = async () => {
-    try { const p = await Notification.requestPermission(); updateNotifyBanner(); if (p === 'granted') showBrowserNotification({ title: 'Уведомления включены \uD83C\uDF89', body: 'Теперь ты узнаешь о новых промокодах первым!' }); } catch {}
+    try { const p = await Notification.requestPermission(); updateNotifyBanner(); if (p === 'granted') showBrowserNotification({ title: 'Уведомления включены 🎉', body: 'Теперь ты узнаешь о новых промокодах первым!' }); } catch {}
   };
 }
 function showBrowserNotification({ title, body, tag }){
@@ -421,7 +396,7 @@ function showBrowserNotification({ title, body, tag }){
     setTimeout(() => { try { n.close(); } catch {} }, 12000);
   } catch {}
 }
-​
+
 // ---------- API ----------
 async function api(path, opts){
   const ctrl = new AbortController();
@@ -433,13 +408,13 @@ async function api(path, opts){
     return { ok: res.ok, status: res.status, data };
   } catch (e) { clearTimeout(timeout); return { ok: false, status: 0, data: null }; }
 }
-​
+
 function showToast(text){
   toast.textContent = text; toast.classList.add('show');
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => toast.classList.remove('show'), 2500);
 }
-​
+
 function timeAgo(iso){
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (diff < 10) return 'только что';
@@ -449,17 +424,17 @@ function timeAgo(iso){
   if (diff < 604800) return `${Math.floor(diff/86400)} дн назад`;
   return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 }
-​
+
 function gameEmoji(name){
-  const list = ['\uD83C\uDFAE','\uD83D\uDD2A','\u2694\uFE0F','\uD83C\uDFAF','\uD83C\uDFC6','\uD83D\uDC8E','\uD83D\uDD25','\u26A1','\uD83C\uDFB2','\uD83D\uDE80','\uD83D\uDC7E','\uD83C\uDFAA'];
+  const list = ['🎮','🔪','⚔️','🎯','🏆','💎','🔥','⚡','🎲','🚀','👾','🎪'];
   let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
   return list[Math.abs(h) % list.length];
 }
-​
+
 function esc(s){
   return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
-​
+
 async function loadPromos({ silent } = {}){
   try {
     const { ok, data } = await api('/api/promos');
@@ -474,39 +449,39 @@ async function loadPromos({ silent } = {}){
     }
   }
 }
-​
+
 function plural(n, one, two, many){
   const m10 = n % 10, m100 = n % 100;
   if (m10 === 1 && m100 !== 11) return one;
   if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return two;
   return many;
 }
-​
+
 function renderGrid(promos, game, silent){
   const ids = promos.map(p => p.id);
   const isFirstLoad = lastIds.length === 0;
   const added = ids.filter(id => !lastIds.includes(id));
   if (silent && added.length === 0 && !lastIds.filter(id => !ids.includes(id)).length && grid.children.length === promos.length) return;
-​
+
   const now = Date.now();
   for (const id of added) freshUntil.set(id, now + 8000);
   lastIds = ids;
-​
+
   if (!promos.length){
-    grid.innerHTML = '<div class="empty">Пока нет ни одного промокода.<br>Заходи позже \uD83D\uDC40</div>';
+    grid.innerHTML = '<div class="empty">Пока нет ни одного промокода.<br>Заходи позже 👀</div>';
     countText.textContent = 'Ожидаем первый промокод';
     return;
   }
-​
+
   countText.textContent = `Доступно ${promos.length} ${plural(promos.length, 'промокод', 'промокода', 'промокодов')}`;
-​
+
   grid.innerHTML = promos.map((p, i) => {
     const fresh = (freshUntil.get(p.id) || 0) > now;
     return `
       <article class="card ${fresh ? 'fresh' : ''}" style="animation-delay:${Math.min(i*50,400)}ms" data-id="${esc(p.id)}">
         <div class="card-top">
           <div class="game-icon">${gameEmoji(p.game)}</div>
-          <span class="badge ${fresh ? 'new' : ''}">${fresh ? '\uD83C\uDD95 Новый' : esc(p.game)}</span>
+          <span class="badge ${fresh ? 'new' : ''}">${fresh ? '🆕 Новый' : esc(p.game)}</span>
         </div>
         <h3 class="game-name">Промокод на ${esc(p.game)}</h3>
         <div class="meta">
@@ -522,28 +497,28 @@ function renderGrid(promos, game, silent){
         <button class="reveal" data-id="${esc(p.id)}">Получить промокод</button>
       </article>`;
   }).join('');
-​
+
   grid.querySelectorAll('.reveal').forEach(btn => {
     btn.addEventListener('click', () => {
       const promo = promos.find(x => x.id === btn.dataset.id);
       if (promo) openForPromo(promo);
     });
   });
-​
+
   if (!isFirstLoad && added.length > 0){
-    showToast('\uD83D\uDD14 Новый промокод на сайте!');
+    showToast('🔔 Новый промокод на сайте!');
     const newPs = promos.filter(p => added.includes(p.id));
     if (newPs.length === 1)
-      showBrowserNotification({ title: '\uD83D\uDD14 Новый промокод!', body: `${newPs[0].game} — от ${newPs[0].channel}`, tag: 'promo-'+newPs[0].id });
+      showBrowserNotification({ title: '🔔 Новый промокод!', body: `${newPs[0].game} — от ${newPs[0].channel}`, tag: 'promo-'+newPs[0].id });
     else if (newPs.length > 1)
-      showBrowserNotification({ title: `\uD83D\uDD14 ${newPs.length} новых промокода!`, body: newPs.slice(0,3).map(p => `${p.game} — ${p.channel}`).join('\n'), tag: 'promo-multi-'+Date.now() });
+      showBrowserNotification({ title: `🔔 ${newPs.length} новых промокода!`, body: newPs.slice(0,3).map(p => `${p.game} — ${p.channel}`).join('\n'), tag: 'promo-multi-'+Date.now() });
   }
 }
-​
+
 setInterval(() => {
   document.querySelectorAll('[data-added]').forEach(el => { el.textContent = timeAgo(el.dataset.added); });
 }, 30_000);
-​
+
 function openOverlay(){
   lastFocused = document.activeElement;
   overlay.classList.add('show'); overlay.setAttribute('aria-hidden', 'false');
@@ -557,7 +532,7 @@ function closeOverlay(){
 closeBtn.addEventListener('click', closeOverlay);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay(); });
-​
+
 function renderLoading(){
   modalBody.innerHTML = '<div class="spinner"></div><h2 class="m-title" id="modalTitle">Секунду…</h2><p class="m-sub">Готовимся</p>';
 }
@@ -565,21 +540,19 @@ function renderError(title, text, retry){
   modalBody.innerHTML = `<h2 class="m-title" id="modalTitle">${esc(title)}</h2><p class="m-sub">${esc(text)}</p>${retry ? '<button class="btn" id="retryBtn">Попробовать снова</button>' : ''}`;
   if (retry) $('retryBtn').addEventListener('click', () => openForPromo(currentPromo));
 }
-​
+
 async function openForPromo(promo){
   currentPromo = promo;
   renderLoading();
   openOverlay();
   renderSlider();
 }
-​
+
 // ===== СЛАЙДЕР-КАПЧА =====
-// Боты и скрипты не имитируют человеческое движение мыши с постепенным ускоႈением и диспеႈсией.
-// Сеႈвеႈ также пႈовеႈяет: duration >= 280мс, eventCount >= 5, variance >= 0.08.
 function renderSlider(){
   modalBody.innerHTML = `
-    <h2 class="m-title" id="modalTitle">Пႈовеႈка</h2>
-    <p class="m-sub">Пеႈетащи движку впႈаво до конца, чтобы получить пႈомокод</p>
+    <h2 class="m-title" id="modalTitle">Проверка</h2>
+    <p class="m-sub">Перетащи движку вправо до конца, чтобы получить промокод</p>
     <div class="slider-wrap" id="sliderWrap">
       <div class="slider-track" id="sliderTrack">
         <div class="slider-fill" id="sliderFill"></div>
@@ -596,36 +569,34 @@ function renderSlider(){
     </div>
     <div class="err" id="sliderErr"></div>
   `;
-​
+
   const track = $('sliderTrack');
   const thumb = $('sliderThumb');
   const fill  = $('sliderFill');
   const hint  = $('sliderHint');
   const errEl = $('sliderErr');
-​
-  const THUMB_W  = 44; // px (шиႈина ползунка в CSS)
-  const THRESHOLD = 0.88; // доля тႈека котоႈую нужно пႈойти
-​
+
+  const THUMB_W  = 44;
+  const THRESHOLD = 0.88;
+
   let dragging = false;
   let startX = 0, startLeft = 0;
   let startTime = 0;
-  let positions = [];   // [{x, t}]
+  let positions = [];
   let isDone = false;
-​
+
   function getTrackWidth(){ return track.getBoundingClientRect().width; }
   function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
-  function getRatio(){ return parseFloat(thumb.style.left) / (getTrackWidth() - THUMB_W); }
-​
+
   function setLeft(px){
     thumb.style.left = px + 'px';
     fill.style.width  = (px + THUMB_W) + 'px';
     if (px > 8) hint.classList.add('hidden');
     else hint.classList.remove('hidden');
   }
-​
-  // Инициализация: ползунок на 0
+
   setLeft(0);
-​
+
   function onStart(clientX){
     if (isDone) return;
     dragging = true;
@@ -635,7 +606,7 @@ function renderSlider(){
     positions = [{ x: clientX, t: startTime }];
     errEl.textContent = '';
   }
-​
+
   function onMove(clientX){
     if (!dragging || isDone) return;
     const trackW = getTrackWidth();
@@ -644,28 +615,24 @@ function renderSlider(){
     setLeft(newLeft);
     const now = Date.now();
     positions.push({ x: clientX, t: now });
-    // Огႈаничиваем размеႈ массива в памяти
     if (positions.length > 300) positions = positions.slice(-150);
   }
-​
+
   function onEnd(){
     if (!dragging || isDone) return;
     dragging = false;
     const trackW = getTrackWidth();
     const ratio  = parseFloat(thumb.style.left) / (trackW - THUMB_W);
     const duration = Date.now() - startTime;
-​
+
     if (ratio < THRESHOLD){
-      // Не дотянул — возвႈащаем назад
       thumb.classList.add('released');
       setLeft(0);
       setTimeout(() => thumb.classList.remove('released'), 350);
       return;
     }
-​
-    // Дотянул — считаем статистику движения
+
     const eventCount = positions.length;
-    // Диспеႈсия шагов (насколько неႈавномеႈное движение)
     let variance = 0;
     if (positions.length >= 3){
       const deltas = [];
@@ -681,83 +648,77 @@ function renderSlider(){
         variance = mean > 0 ? std / mean : 0;
       }
     }
-​
-    // Закончиваем доводим до конца
+
     isDone = true;
     thumb.classList.add('done');
     fill.classList.add('done');
     hint.classList.add('hidden');
     thumb.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-​
-    // Отпႈавляем на сеႈвеႈ
+
     verifyAndReveal({ duration, eventCount, variance });
   }
-​
-  // Mouse
+
   thumb.addEventListener('mousedown', e => { e.preventDefault(); onStart(e.clientX); });
   document.addEventListener('mousemove', e => onMove(e.clientX));
   document.addEventListener('mouseup', () => onEnd());
-​
-  // Touch
+
   thumb.addEventListener('touchstart', e => { e.preventDefault(); onStart(e.touches[0].clientX); }, { passive: false });
   document.addEventListener('touchmove', e => { if (dragging) onMove(e.touches[0].clientX); }, { passive: true });
   document.addEventListener('touchend', () => onEnd());
-​
+
   async function verifyAndReveal({ duration, eventCount, variance }){
-    // Пеႈецвет ползунка, пока ждём
     const { ok: vOk, status: vSt, data: vData } = await api('/api/verify-slider', {
       method: 'POST',
       body: JSON.stringify({ duration, eventCount, variance })
     });
-​
+
     if (!vOk){
-      if (vSt === 429){ renderError('Слишком много попыток', 'Попႈобуй чеႈез немного', false); return; }
-      renderError('Ошибка', 'Попႈобуй ещё ႈаз', true); return;
+      if (vSt === 429){ renderError('Слишком много попыток', 'Попробуй через немного', false); return; }
+      renderError('Ошибка', 'Попробуй ещё раз', true); return;
     }
-​
+
     const token = vData && vData.token;
-    if (!token){ renderError('Ошибка', 'Попႈобуй ещё ႈаз', true); return; }
-​
+    if (!token){ renderError('Ошибка', 'Попробуй ещё раз', true); return; }
+
     const { ok, status, data } = await api('/api/reveal', {
       method: 'POST',
       body: JSON.stringify({ token, promoId: currentPromo.id })
     });
-​
+
     if (ok && data && data.code){ renderCode(data); return; }
     if (status === 404){ closeOverlay(); loadPromos(); return; }
-    if (status === 429){ renderError('Слишком много попыток', 'Попႈобуй чеႈез немного', false); return; }
-    renderError('Не получилось', 'Попႈобуй ещё ႈаз', true);
+    if (status === 429){ renderError('Слишком много попыток', 'Попробуй через немного', false); return; }
+    renderError('Не получилось', 'Попробуй ещё раз', true);
   }
 }
-​
-// ===== Пႈомокод на Canvas =====
-// Canvas защищает код от паႈсинга (getComputedStyle/innerHTML/селекция) — виден только визуально.
+
+// ===== Промокод на Canvas =====
 function renderCode({ code, game, channel }){
   modalBody.innerHTML = `
     <svg class="success" viewBox="0 0 52 52" aria-hidden="true">
       <circle cx="26" cy="26" r="24"/>
       <path d="M14 27l8 8 16-16"/>
     </svg>
-    <h2 class="m-title" id="modalTitle">Пႈомокод для ${esc(game)}</h2>
-    <p class="m-sub">Скопиႈуй и активиႈуй в игႈе${channel ? `<br>От канала <b>${esc(channel)}</b>` : ''}</p>
+    <h2 class="m-title" id="modalTitle">Промокод для ${esc(game)}</h2>
+    <p class="m-sub">Скопируй и активируй в игре${channel ? `<br>От канала <b>${esc(channel)}</b>` : ''}</p>
     <div class="code-canvas-wrap">
-      <canvas id="codeCanvas" aria-label="Пႈомокод"></canvas>
+      <canvas id="codeCanvas" aria-label="Промокод"></canvas>
     </div>
-    <button class="btn" id="copyBtn">Скопиႈовать код</button>
+    <button class="btn" id="copyBtn">Скопировать код</button>
   `;
-​
+
   const canvas = $('codeCanvas');
   drawCode(canvas, code);
-​
+
   const copyBtn = $('copyBtn');
   copyBtn.addEventListener('click', async () => {
     const ok = await copyText(code);
-    copyBtn.textContent = ok ? 'Скопиႈовано ✓' : 'Выдели вႈучную';
+    copyBtn.textContent = ok ? 'Скопировано ✓' : 'Выдели вручную';
     if (ok) copyBtn.classList.add('copied');
-    setTimeout(() => { copyBtn.textContent = 'Скопиႈовать код'; copyBtn.classList.remove('copied'); }, 1900);
+    setTimeout(() => { copyBtn.textContent = 'Скопировать код'; copyBtn.classList.remove('copied'); }, 1900);
   });
 }
-​
+
 function drawCode(canvas, code){
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
   const W = 360, H = 80;
@@ -765,13 +726,11 @@ function drawCode(canvas, code){
   canvas.height = H * DPR;
   canvas.style.width  = W + 'px';
   canvas.style.height = H + 'px';
-​
+
   const ctx = canvas.getContext('2d');
   ctx.scale(DPR, DPR);
-​
-  // Фон
+
   ctx.clearRect(0, 0, W, H);
-  // Текст — Arial хорошо рендерит кириллицу на любом устройстве
   const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
   const fontSize = Math.min(30, Math.floor(W * 0.076));
   ctx.fillStyle = isDark ? '#60a5fa' : '#0071e3';
@@ -779,8 +738,7 @@ function drawCode(canvas, code){
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(code, W/2, H/2);
-​
-  // Кривая полупрозрачная линия (anti-OCR, читаемость не нарушает)
+
   ctx.strokeStyle = isDark ? 'rgba(96,165,250,.20)' : 'rgba(0,113,227,.16)';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -789,7 +747,7 @@ function drawCode(canvas, code){
   ctx.stroke();
   ctx.stroke();
 }
-​
+
 async function copyText(text){
   try { if (navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; } } catch {}
   try {
@@ -800,7 +758,7 @@ async function copyText(text){
     const ok = document.execCommand('copy'); ta.remove(); return ok;
   } catch { return false; }
 }
-​
+
 // ---------- SSE ----------
 function connectSSE(){
   let es; try { es = new EventSource('/api/events'); } catch { return; }
@@ -810,8 +768,8 @@ function connectSSE(){
   };
   es.onerror = () => {};
 }
-​
-// ---------- Стаႈт ----------
+
+// ---------- Старт ----------
 updateNotifyBanner();
 loadPromos();
 connectSSE();
@@ -820,4 +778,3 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) load
 </script>
 </body>
 </html>
-​
