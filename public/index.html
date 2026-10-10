@@ -237,7 +237,7 @@
     cursor:grab;
     transition:box-shadow .2s,left 0s;
     z-index:2;
-    touch-action:none;              /* важно: отключает скролл при drag на мобилке */
+    touch-action:none;
     user-select:none;-webkit-user-select:none;
   }
   .slider-thumb:active{cursor:grabbing}
@@ -367,7 +367,6 @@ const notifyText = $('notifyText'), notifyBell = $('notifyBell');
 let lastFocused = null, currentPromo = null, lastIds = [];
 const freshUntil = new Map();
 
-// Глобальный флаг: только что тащили ползунок — чтобы случайный click не закрыл окно
 let lastDragAt = 0;
 
 // ---------- УВЕДОМЛЕНИЯ ----------
@@ -537,10 +536,9 @@ function closeOverlay(){
 }
 closeBtn.addEventListener('click', closeOverlay);
 
-// Закрываем только если КЛИК был на самом фоне и не сразу после драга ползунка
 overlay.addEventListener('click', e => {
   if (e.target !== overlay) return;
-  if (Date.now() - lastDragAt < 500) return;   // 500мс защита после драга
+  if (Date.now() - lastDragAt < 800) return;
   closeOverlay();
 });
 
@@ -561,7 +559,7 @@ async function openForPromo(promo){
   renderSlider();
 }
 
-// ===== СЛАЙДЕР-КАПЧА (Pointer Events + setPointerCapture) =====
+// ===== СЛАЙДЕР-КАПЧА v3 =====
 function renderSlider(){
   modalBody.innerHTML = `
     <h2 class="m-title" id="modalTitle">Проверка</h2>
@@ -590,7 +588,7 @@ function renderSlider(){
   const errEl = $('sliderErr');
 
   const THUMB_W  = 44;
-  const THRESHOLD = 0.85;
+  const THRESHOLD = 0.80;   // мягче: достаточно 80% пути
 
   let dragging = false;
   let startX = 0, startLeft = 0;
@@ -610,6 +608,11 @@ function renderSlider(){
 
   setLeft(0);
 
+  function addPoint(x, t){
+    positions.push({ x, t: t || Date.now() });
+    if (positions.length > 400) positions = positions.slice(-200);
+  }
+
   function onStart(clientX){
     if (isDone) return;
     dragging = true;
@@ -621,16 +624,11 @@ function renderSlider(){
     lastDragAt = Date.now();
   }
 
-  function onMove(clientX){
-    if (!dragging || isDone) return;
+  function updatePos(clientX){
     const trackW = getTrackWidth();
     const maxLeft = trackW - THUMB_W;
     const newLeft = clamp(startLeft + (clientX - startX), 0, maxLeft);
     setLeft(newLeft);
-    const now = Date.now();
-    positions.push({ x: clientX, t: now });
-    if (positions.length > 300) positions = positions.slice(-150);
-    lastDragAt = now;
   }
 
   function calcStats(){
@@ -644,10 +642,13 @@ function renderSlider(){
     return { maxJump, totalDist };
   }
 
-  function onEnd(){
+  function onEnd(finalX){
     if (!dragging || isDone) return;
     dragging = false;
     lastDragAt = Date.now();
+
+    // Финальная точка — обязательно!
+    if (typeof finalX === 'number') addPoint(finalX, Date.now());
 
     const trackW = getTrackWidth();
     const ratio  = parseFloat(thumb.style.left) / (trackW - THUMB_W);
@@ -662,14 +663,14 @@ function renderSlider(){
 
     const eventCount = positions.length;
     let variance = 0;
-    if (positions.length >= 3){
+    if (positions.length >= 4){
       const deltas = [];
       for (let i = 1; i < positions.length; i++){
         const dt = positions[i].t - positions[i-1].t;
         const dx = Math.abs(positions[i].x - positions[i-1].x);
         if (dt > 0) deltas.push(dx / dt);
       }
-      if (deltas.length >= 2){
+      if (deltas.length >= 3){
         const mean = deltas.reduce((s,v) => s+v, 0) / deltas.length;
         const sq   = deltas.reduce((s,v) => s + (v-mean)**2, 0) / deltas.length;
         const std  = Math.sqrt(sq);
@@ -687,9 +688,7 @@ function renderSlider(){
     verifyAndReveal({ duration, eventCount, variance, maxJump, totalDist });
   }
 
-  // --- Pointer Events: работают и для мыши, и для тача ---
-  // setPointerCapture гарантирует, что все move/up приходят именно в thumb,
-  // а не "убегают" на overlay → окно больше не закроется при быстром перетаскивании.
+  // --- POINTER EVENTS + COALESCED ---
   thumb.addEventListener('pointerdown', (e) => {
     if (isDone) return;
     e.preventDefault();
@@ -699,21 +698,42 @@ function renderSlider(){
   });
 
   thumb.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    onMove(e.clientX);
+    if (!dragging || isDone) return;
+    e.preventDefault();
+
+    // getCoalescedEvents — все промежуточные точки, которые браузер "схлопнул" в одно событие
+    let coalesced = [];
+    try {
+      if (typeof e.getCoalescedEvents === 'function') {
+        coalesced = e.getCoalescedEvents() || [];
+      }
+    } catch {}
+
+    if (coalesced.length > 0){
+      for (const ev of coalesced){
+        addPoint(ev.clientX, ev.timeStamp || Date.now());
+      }
+    } else {
+      addPoint(e.clientX, e.timeStamp || Date.now());
+    }
+
+    updatePos(e.clientX);
+    lastDragAt = Date.now();
   });
 
   thumb.addEventListener('pointerup', (e) => {
     if (!dragging) return;
+    e.preventDefault();
     try { thumb.releasePointerCapture(e.pointerId); } catch {}
-    onEnd();
+    // Обновить позицию по финальной точке, чтобы ratio был точным
+    updatePos(e.clientX);
+    onEnd(e.clientX);
   });
 
-  thumb.addEventListener('pointercancel', () => {
-    if (dragging) onEnd();
+  thumb.addEventListener('pointercancel', (e) => {
+    if (dragging) onEnd(e.clientX);
   });
 
-  // На всякий: если мышь "потерялась" за пределами окна
   window.addEventListener('blur', () => { if (dragging) onEnd(); });
 
   async function verifyAndReveal({ duration, eventCount, variance, maxJump, totalDist }){
