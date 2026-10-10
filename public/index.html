@@ -234,8 +234,11 @@
     background:var(--card-solid);border:1px solid var(--border-strong);
     box-shadow:0 4px 14px rgba(0,0,0,.35);
     display:grid;place-items:center;
-    cursor:grab;transition:box-shadow .2s,left 0s;
-    z-index:2;touch-action:none;
+    cursor:grab;
+    transition:box-shadow .2s,left 0s;
+    z-index:2;
+    touch-action:none;              /* важно: отключает скролл при drag на мобилке */
+    user-select:none;-webkit-user-select:none;
   }
   .slider-thumb:active{cursor:grabbing}
   .slider-thumb.released{transition:left .3s cubic-bezier(.22,.61,.36,1),box-shadow .2s}
@@ -245,7 +248,7 @@
     box-shadow:0 4px 16px rgba(48,209,88,.4);
     cursor:default;
   }
-  .slider-thumb svg{width:18px;height:18px;stroke:var(--text2);transition:stroke .2s}
+  .slider-thumb svg{width:18px;height:18px;stroke:var(--text2);transition:stroke .2s;pointer-events:none}
   .slider-thumb.done svg{stroke:#fff}
 
   .err{min-height:18px;margin:6px 2px 12px;font-size:13px;color:var(--red);text-align:center;transition:opacity .2s}
@@ -363,6 +366,9 @@ const notifyText = $('notifyText'), notifyBell = $('notifyBell');
 
 let lastFocused = null, currentPromo = null, lastIds = [];
 const freshUntil = new Map();
+
+// Глобальный флаг: только что тащили ползунок — чтобы случайный click не закрыл окно
+let lastDragAt = 0;
 
 // ---------- УВЕДОМЛЕНИЯ ----------
 function updateNotifyBanner(){
@@ -530,7 +536,14 @@ function closeOverlay(){
   if (lastFocused && lastFocused.focus) lastFocused.focus();
 }
 closeBtn.addEventListener('click', closeOverlay);
-overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
+
+// Закрываем только если КЛИК был на самом фоне и не сразу после драга ползунка
+overlay.addEventListener('click', e => {
+  if (e.target !== overlay) return;
+  if (Date.now() - lastDragAt < 500) return;   // 500мс защита после драга
+  closeOverlay();
+});
+
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay(); });
 
 function renderLoading(){
@@ -548,7 +561,7 @@ async function openForPromo(promo){
   renderSlider();
 }
 
-// ===== СЛАЙДЕР-КАПЧА =====
+// ===== СЛАЙДЕР-КАПЧА (Pointer Events + setPointerCapture) =====
 function renderSlider(){
   modalBody.innerHTML = `
     <h2 class="m-title" id="modalTitle">Проверка</h2>
@@ -577,7 +590,7 @@ function renderSlider(){
   const errEl = $('sliderErr');
 
   const THUMB_W  = 44;
-  const THRESHOLD = 0.88;
+  const THRESHOLD = 0.85;
 
   let dragging = false;
   let startX = 0, startLeft = 0;
@@ -605,6 +618,7 @@ function renderSlider(){
     startTime = Date.now();
     positions = [{ x: clientX, t: startTime }];
     errEl.textContent = '';
+    lastDragAt = Date.now();
   }
 
   function onMove(clientX){
@@ -616,6 +630,7 @@ function renderSlider(){
     const now = Date.now();
     positions.push({ x: clientX, t: now });
     if (positions.length > 300) positions = positions.slice(-150);
+    lastDragAt = now;
   }
 
   function calcStats(){
@@ -632,6 +647,8 @@ function renderSlider(){
   function onEnd(){
     if (!dragging || isDone) return;
     dragging = false;
+    lastDragAt = Date.now();
+
     const trackW = getTrackWidth();
     const ratio  = parseFloat(thumb.style.left) / (trackW - THUMB_W);
     const duration = Date.now() - startTime;
@@ -670,13 +687,34 @@ function renderSlider(){
     verifyAndReveal({ duration, eventCount, variance, maxJump, totalDist });
   }
 
-  thumb.addEventListener('mousedown', e => { e.preventDefault(); onStart(e.clientX); });
-  document.addEventListener('mousemove', e => onMove(e.clientX));
-  document.addEventListener('mouseup', () => onEnd());
+  // --- Pointer Events: работают и для мыши, и для тача ---
+  // setPointerCapture гарантирует, что все move/up приходят именно в thumb,
+  // а не "убегают" на overlay → окно больше не закроется при быстром перетаскивании.
+  thumb.addEventListener('pointerdown', (e) => {
+    if (isDone) return;
+    e.preventDefault();
+    e.stopPropagation();
+    try { thumb.setPointerCapture(e.pointerId); } catch {}
+    onStart(e.clientX);
+  });
 
-  thumb.addEventListener('touchstart', e => { e.preventDefault(); onStart(e.touches[0].clientX); }, { passive: false });
-  document.addEventListener('touchmove', e => { if (dragging) onMove(e.touches[0].clientX); }, { passive: true });
-  document.addEventListener('touchend', () => onEnd());
+  thumb.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    onMove(e.clientX);
+  });
+
+  thumb.addEventListener('pointerup', (e) => {
+    if (!dragging) return;
+    try { thumb.releasePointerCapture(e.pointerId); } catch {}
+    onEnd();
+  });
+
+  thumb.addEventListener('pointercancel', () => {
+    if (dragging) onEnd();
+  });
+
+  // На всякий: если мышь "потерялась" за пределами окна
+  window.addEventListener('blur', () => { if (dragging) onEnd(); });
 
   async function verifyAndReveal({ duration, eventCount, variance, maxJump, totalDist }){
     const { ok: vOk, status: vSt, data: vData } = await api('/api/verify-slider', {
